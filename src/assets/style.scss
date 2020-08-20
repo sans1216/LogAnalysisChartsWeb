@@ -1,0 +1,289 @@
+@import './enum.scss';
+
+* {
+    box-sizing: border-box;
+    outline: none;
+}
+
+;
+
+html {
+    font-size: 1rem;
+    height: 100%;
+}
+
+;
+
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+//主页样式
+.collapsed-menu span {
+    width: 0px;
+    transition: width 0.2s ease;
+}
+
+.collapsed-menu i {
+    transform: translateX(.384615rem);
+    transition: font-size 0.2s ease 0.2s, transform 0.2s ease 0.2s;
+    vertical-align: middle;
+    font-size: 1.692308rem;
+}
+
+.pheader {
+    height: 6rem;
+    border-radius: .307692rem;
+    color: map-get($colors, 'light');
+    width: 36%;
+    margin: auto;
+    padding: 1.7rem 0 0;
+    font-size: 1.65rem;
+    background-color: map-get($map: $colors, $key: 'card-color');
+    box-shadow: .692308rem .230769rem 1.153846rem map-get($map: $colors, $key: 'shadow');
+    animation: color 3s ease 1s infinite forwards
+}
+
+.layout-con {
+    height: 100%;
+    width: 100%;
+}
+
+.ivu-card {
+    display: block;
+    background: #0f3c6e9e;
+    border-radius: 0.307692rem;
+    font-size: 1.076923rem;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.ivu-card-bordered {
+    border: 1px solid #2257c2;
+    border-color: #8ac2f8c4;
+    margin-top: 1.2rem;
+}
+
+.menu-item span {
+    display: inline-block;
+    overflow: hidden;
+    width: 5.307692rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+    transition: width 0.2s ease 0.2s;
+}
+
+.menu-item i {
+    transform: translateX(0px);
+    transition: font-size 0.2s ease, transform 0.2s ease;
+    vertical-align: middle;
+    font-size: 1.230769rem;
+}
+
+.ivu-layout {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+
+}
+
+.ivu-layout-content {
+    flex: auto;
+    background-size: 100% 100%;
+    height: 58.5rem
+}
+
+.line {
+    border: 0;
+    background-color: map-get($map: $colors, $key: 'bd-color');
+    ;
+    height: 1px;
+}
+
+ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
+.ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu):hover,
+.ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu),
+.ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu):hover {
+    background: #455a89;
+}
+
+.ivu-menu-dark {
+    background: #455a89;
+}
+
+.ivu-time-picker-with-range .ivu-time-picker-cells-list:last-child {
+    border-radius: 0;
+    display: none;
+}
+
+.ivu-time-picker-cells-list {
+    width: 6.461538rem;
+    max-height: 11.076923rem;
+    float: left;
+    overflow: hidden;
+    border-left: 1px solid #e8eaec;
+    position: relative;
+}
+
+#app>div>div.ivu-layout-sider>div.ivu-layout-sider-children>ul>a:visited {
+    background: #06276e;
+}
+
+.ivu-layout-sider {
+    transition: all .2s ease-in-out;
+    position: relative;
+    background: #455a89;
+}
+
+.ivu-layout-sider-trigger {
+    bottom: 0;
+    text-align: center;
+    cursor: pointer;
+    height: 3.692308rem;
+    line-height: 3.692308rem;
+    color: #fff;
+    background: #455a89;
+    z-index: 1000;
+    transition: all .2s ease-in-out;
+}
+
+.test {
+    background-image: url(./images/bg1.png);
+    background-size: 100% 100%;
+    height: 100%;
+    margin: 0px;
+}
+
+@keyframes color {
+    0% {
+        color: map-get($map: $colors, $key: 'light')
+    }
+
+    30% {
+        color: map-get($map: $colors, $key: 'light-1')
+    }
+
+    60% {
+        color: map-get($map: $colors, $key: 'light-2')
+    }
+
+    100% {
+        color: map-get($map: $colors, $key: 'light-3')
+    }
+}
+
+
+.dateTitle {
+    font-size: 1.2rem;
+    color: map-get($map: $colors, $key: 'info');
+}
+
+.chart-title {
+    color: map-get($map: $colors, $key: 'info');
+    padding: .92rem 1.3rem;
+}
+
+#chartmap {
+    top: -1.4rem;
+}
+
+.leftBox {
+    background-color: map-get($map: $colors, $key:'card-color');
+    height: 100%;
+    border-radius: 1.076923rem;
+}
+
+.mainBox {
+    background-color: map-get($map: $colors, $key:'card-color');
+    width: 100%;
+    height: 100%;
+    border-radius: 1.076923rem;
+}
+
+.rightBox {
+    background-color: map-get($map: $colors, $key:'card-color');
+    width: 100%;
+    height: 100%;
+    border-radius: 1.076923rem;
+}
+
+.vicChart {
+    padding: .769231rem 0;
+    width: 94%;
+    position: relative;
+    top: -11.8%;
+    left: 3%;
+}
+
+.btnSuggest {
+    background-color: #2259878c;
+    position: relative;
+    width: 28%;
+    height: 7%;
+    border-radius: 1.076923rem;
+    top: -145%;
+    left: 74%;
+
+    &.h3 {
+        padding-left: 33%;
+    }
+}
+
+.timeBox {
+    background-color: map-get($map: $colors, $key:'card-color');
+    width: 80%;
+    margin: 1% 10%;
+    height: 67%;
+    border-radius: 1.076923rem;
+}
+
+.changeBtn {
+    width: 100%;
+    height: 5%;
+    position: relative;
+    top: -6%;
+    left: 0;
+}
+
+.changeBtn:hover {
+    color: rgb(27, 106, 252);
+}
+
+.assetBox {
+    background-color: map-get($map: $colors, $key:'card-color');
+    border-radius: 1.076923rem;
+    height: 96%;
+}
+
+.sgBox {
+    background-color: #1f3d4dfc;
+    margin: auto;
+    width: 60%;
+    height: 88%;
+    position: fixed;
+    top: 4%;
+    left: 21%;
+    clear: both;
+    border-radius: 1.2rem;
+    z-index: 9999999999;
+
+
+    p {
+        font-size: 1rem;
+        padding : 0.2rem 0 1rem 2%;;
+        color: map-get($map: $colors, $key:'info');
+    }
+
+    button {
+        position: fixed;
+        bottom:9.5%;
+        left: 47%;
+    }
+}
+
+.sg-Dialog {
+    width: 100%;
+    height: 100%;
+}
