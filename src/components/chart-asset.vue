@@ -23,7 +23,7 @@ export default {
     return {
       colors: ["#2EE7FF", "#86FED8", "#0f225E", "#8ac2f8c4"],
       isLoading: true,
-      assData:null,
+      assData: null
     };
   },
   props: {
@@ -39,8 +39,9 @@ export default {
     });
   },
   methods: {
-    async initEchart() {
-      await this.$http.post("/api/RiskAsset/all", null, res => {
+    async initEchart(data) {
+      console.log("aaaa");
+      await this.$http.post("/api/RiskAsset/all", data, res => {
         if (res.data.code === 200) {
           this.isLoading = false;
           this.assData = res.data.data;
@@ -66,7 +67,7 @@ export default {
               {
                 name: "资产分布",
                 type: "pie",
-                radius: ["50%", "60%"],
+                radius: ["40%", "50%"],
                 top: -60,
                 left: 0,
                 avoidLabelOverlap: false,
@@ -84,7 +85,7 @@ export default {
                 labelLine: {
                   show: false
                 },
-                data:this.assData.riskAssetVo2.list
+                data: this.assData.riskAssetVo2.list
               }
             ]
           });

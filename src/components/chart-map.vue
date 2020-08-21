@@ -45,12 +45,13 @@ export default {
     this.initVicEchart();
   },
   methods: {
-    async initVicEchart() {
-      await this.$http.post("/api/Victim/analysis", null, res => {
-        if (res.data.code == 200) {
+    async initVicEchart(data) {
+      await this.$http.post("/api/Victim/analysis", data, res => {
+        if (res.data.code === 200) {
           this.isLoading = false;
           this.msg = "受害者";
           this.data = res.data.data;
+          this.processData();
           const myseries = [
             {
               name: "受害热度",
@@ -77,7 +78,7 @@ export default {
           const victimOptions = {
             title: {
               subtext: "不同地域所遭受的攻击详情",
-              left: 215
+              left: 285
             },
             tooltip: {
               trigger: "item",
@@ -121,14 +122,16 @@ export default {
           myChart.setOption(victimOptions);
           this.chartConfig = this.data.latestVictim;
           this.chartConfig.rowNum = 2;
+          this.chartConfig.hoverPause = true;
         }
       });
     },
     async initAttEchart() {
       await this.$http.post("/api/Attacker/analysis", null, res => {
-        if (res.data.data.code == 200) {
+        if (res.data.code === 200) {
           this.msg = "攻击者";
           this.data = res.data.data;
+          console.log(this.data);
           const myseries = [
             {
               name: "攻击热度",
@@ -140,7 +143,7 @@ export default {
               data: this.data.maps[0]
             },
             {
-              name: "攻击主要类型",
+              name: "攻击链类型",
               type: "map",
               mapType: "world",
               label: {
@@ -161,7 +164,7 @@ export default {
             },
             title: {
               subtext: "不同地域所发起的攻击详情",
-              left: 295
+              left: 285
             },
             tooltip: {
               trigger: "item",
@@ -208,9 +211,56 @@ export default {
         }
       });
     },
+    processData() {
+      let v = 0;
+      const omIndex = this.data.maps[0].findIndex(
+        element => element.name === "欧盟"
+      );
+      var Europe = [
+        "Austria",
+        "Belgium",
+        "Bulgaria",
+        "Croatia",
+        "Cyprus",
+        "Czech Rep",
+        "Denmark",
+        "Estonia",
+        "Finland",
+        "Greece",
+        "Hungary",
+        "Ireland",
+        "Latvia",
+        "Lithuania",
+        "United Kingdom",
+        "Luxembourg",
+        "Republic of Malta",
+        "Nederland",
+        "Poland",
+        "Portugal",
+        "Slovakia",
+        "Slovenia"
+      ];
 
+      this.data.maps[0].splice(omIndex, 1, {
+        name: Europe[0],
+        value: this.data.maps[0][omIndex].value
+      });
+      for (let i = 1; i < Europe.length; i++)
+        this.data.maps[0].splice(omIndex, 0, {
+          name: Europe[i],
+          value: this.data.maps[0][omIndex].value
+        });
+      this.data.maps[1].splice(omIndex, 1, {
+        name: Europe[0],
+        value: this.data.maps[1][omIndex].value
+      });
+      for (let i = 1; i < Europe.length; i++)
+        this.data.maps[1].splice(omIndex, 0, {
+          name: Europe[i],
+          value: this.data.maps[1][omIndex].value
+        });
+    },
     changeProfile() {
-      console.log(this.isVictim);
       if (this.isVictim) {
         this.initAttEchart();
         this.isVictim = false;

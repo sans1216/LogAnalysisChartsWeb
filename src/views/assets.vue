@@ -1,5 +1,5 @@
 <template>
-  <div style="padding:0  1.4rem;height:100%">
+  <div style="padding:0  1.4rem;height:100%" ref="assetBig">
     <div style="display:flex;width:100%;height:35%">
       <dv-border-box-12 class="assetBox" style="margin:0 5rem;width: 94%;">
         <h3 class="chart-title" style="padding-top:2rem">风险资产数量分布</h3>
@@ -43,14 +43,11 @@ export default {
     this.initEchart();
   },
   methods: {
-    async initEchart() {
-      await this.$http.post("/api/RiskAsset/all", null, res => {
+    async initEchart(data) {
+      await this.$http.post("/api/RiskAsset/all", data, res => {
           const numsChart = this.$echarts.init(
             document.getElementById("assChart1")
           );
-          // const typeChart = this.$echarts.init(
-          //   document.getElementById("assChart2")
-          // );
           const topChart = this.$echarts.init(
             document.getElementById("assTop5")
           );

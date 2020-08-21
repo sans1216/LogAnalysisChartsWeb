@@ -39,7 +39,8 @@ export default {
           this.isLoading = false;
           this.info = res.data.data.suggestionVo1s;
         }
-      });
+      }
+      );
     }
   }
 };

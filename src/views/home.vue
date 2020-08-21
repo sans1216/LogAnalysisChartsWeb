@@ -1,12 +1,12 @@
 <template>
-  <div :class="{'noImage': !data_IsImage}" style="padding:0rem 3.5%;height:100%">
+  <div :class="{'noImage': !data_IsImage}" style="padding:0rem 3.5%;height:100%" >
     <div style="height:100%">
       <div style="margin: auto; height: 100%;width: 100%;">
-        <chartTime :msg="title1" style="width:26%;height:36%"></chartTime>
-        <chartAsset :msg="title2" :config="assetConfig" :data="assetData" style="width:26%;height:34%"></chartAsset>
-        <chartMap class="map" :msg="title3" :config="mapConfig"></chartMap>
-        <chartTopN class="topn1" style="width:26%" :msg="title4" :data="topnData"></chartTopN>
-        <btnSuggest class="btnSuggest" :msg="title5"></btnSuggest>
+        <chartTime ref="time" :msg="title1" style="width:26%;height:36%"></chartTime>
+        <chartAsset ref="asset" :msg="title2" :config="assetConfig" :data="assetData" style="width:26%;height:34%"></chartAsset>
+        <chartMap ref="map" class="map" :msg="title3" :config="mapConfig"></chartMap>
+        <chartTopN ref="topn" class="topn1" style="width:26%" :msg="title4" :data="topnData"></chartTopN>
+        <btnSuggest ref="suggest" class="btnSuggest" :msg="title5"></btnSuggest>
       </div>
     </div>
   </div>
@@ -128,7 +128,9 @@ export default {
     chartTopN,
     btnSuggest,
   },
-  methods: {}
+  methods: {
+
+  }
 };
 </script>
 <style scoped>

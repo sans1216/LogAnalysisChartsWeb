@@ -1,5 +1,5 @@
 <template>
-  <div style="height:100%">
+  <div style="height:100%" ref="topnBig">
     <div style="display:flex;height:100%;margin:auto">
       <dv-border-box-12 class="topnBox">
         <h3 class="chart-title" style="padding-top:2rem">攻击链TOP5</h3>
@@ -46,8 +46,8 @@ export default {
     this.initEchart();
   },
   methods: {
-    async initEchart() {
-      await this.$http.post("/api/Attacker/topN", null, res => {
+    async initEchart(data) {
+      await this.$http.post("/api/Attacker/topN", data, res => {
         if (res.data.code === 200) {
           this.isLoading = false;
           this.data = res.data.data;

@@ -42,8 +42,8 @@ export default {
     });
   },
   methods: {
-    async initEchart() {
-      await this.$http.post("/api/DistributionTrend/all", null, res => {
+    async initEchart(data) {
+      await this.$http.post("/api/DistributionTrend/all", data, res => {
         if (res.data.code == 200) {
           this.isLoading = false;
           this.data = res.data.data;

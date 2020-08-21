@@ -1,5 +1,5 @@
 <template>
-  <div style="height:100%">
+  <div style="height:100%" ref="timeBig">
     <dv-border-box-12 class="timeBox">
       <h2 class="chart-title">数据时序分布趋势图</h2>
       <loadingSign v-if="isLoading" style="top: 48%;left: 44%;"></loadingSign>
@@ -29,8 +29,9 @@ export default {
     });
   },
   methods: {
-    async initEchart() {
-      await this.$http.post("/api/DistributionTrend/all", null, res => {
+    async initEchart(data) {
+      const _this = this;
+      await this.$http.post("/api/DistributionTrend/all", data, res => {
         if (res.data.code === 200) {
         this.isLoading = false;
         this.data = res.data.data;

@@ -1,6 +1,6 @@
 <template>
   <div ref="bg" class="test" :class="{'noImage': !data_IsImage}">
-    <pointwave :color="0x097bdb" style="height:0"/>
+    <pointwave :color="0x097bdb" style="height:0" />
     <div class="container" style="height:100%">
       <div class="menu-l">
         <Button type="info" ghost @click="$router.push('/')" style="margin-left:1.4rem">总体预览</Button>
@@ -95,22 +95,87 @@
         <ColorPicker size="large" style="margin-left:1.5rem" v-model="color" @on-change="changeBG" />
       </div>
       <div style="height:100%">
-        <router-view :key="$route.path"></router-view>
+        <router-view ref="content" :key="$route.path"></router-view>
       </div>
     </div>
   </div>
 </template>
 <script>
 import Pointwave from "@/components/Pointwave";
+import loadingSign from "@/components/loadingSign";
+import bgPic from "@/assets/images/bg1.png"
 export default {
   components: {
-    Pointwave
+    Pointwave,
+    loadingSign
   },
   data() {
     return {
-      color: "#091059",
+      color: "",
       time: "",
-      seconds: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60],
+      seconds: [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60
+      ],
       timeData: null,
       data_IsImage: true,
       isFullScreen: false
@@ -118,18 +183,41 @@ export default {
   },
   created() {},
   methods: {
-    changeTime() {
-      console.log(this.time);
-    },
+    changeTime() {},
     reDraw() {
-      console.log("reDraw");
+      let path = this.$route.path;
+      if (path === "/") {
+        console.log(this.time);
+        this.$refs.content.$refs.asset.initEchart(this.time);
+        this.$refs.content.$refs.map.initAttEchart(this.time);
+        this.$refs.content.$refs.map.initVicEchart(this.time);
+        this.$refs.content.$refs.topn.initEchart(this.time);
+        this.$refs.content.$refs.time.initEchart(this.time);
+      } else if(path ==="/victims") {
+        this.$refs.content.$refs.vicBig.__vue__.initEchart(this.time);
+      } else if(path ==="/attackers") {
+        this.$refs.content.$refs.attBig.__vue__.initEchart(this.time);
+      } else if(path ==="/topn") {
+        this.$refs.content.$refs.topnBig.__vue__.initEchart(this.time);
+      } else if(path ==="/assets") {
+        this.$refs.content.$refs.assetBig.__vue__.initEchart(this.time);
+      } else if(path ==="/timetrend") {
+        this.$refs.content.$refs.timeBig.__vue__.initEchart(this.time);
+      }
     },
     exportFile() {
-      console.log("export");
+      console.log("导出表格");
     },
     changeBG() {
-      this.data_IsImage = false;
-      this.$refs.bg.style.background = this.color;
+      console.log(this.color)
+      if (this.color != '') {
+        this.data_IsImage = false;
+        this.$refs.bg.style.background = this.color;
+      }else{
+        this.data_IsImage = true;
+        this.$refs.bg.style.backgroundImage = bgPic;
+        console.log(this.$refs.bg.style.backgroundImage)
+      }
     },
     getFullScreen() {
       this.isFullScreen = true;
@@ -141,8 +229,8 @@ export default {
       console.log(this.isFullScreen);
     },
     FullCreeen(element) {
-      this.$refs.tools.style.margin="1.8% 41%";
-      this.$refs.tools.style.height="2rem" ;
+      this.$refs.tools.style.margin = "1.8% 41%";
+      this.$refs.tools.style.height = "2rem";
       let el = element;
       let rfs =
         el.requestFullScreen ||
@@ -160,9 +248,8 @@ export default {
     },
     //退出全屏的方法
     outFullCreeen(element) {
-
-      this.$refs.tools.style.margin="0.4% 31%";
-      this.$refs.tools.style.height="4rem" ;
+      this.$refs.tools.style.margin = "0.4% 31%";
+      this.$refs.tools.style.height = "4rem";
       let el = element;
       let cfs =
         el.cancelFullScreen ||
@@ -189,9 +276,9 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
-.container{
-    height: 100%;
-    position: relative;
+.container {
+  height: 100%;
+  position: relative;
 }
 .noImage {
   background-image: none;

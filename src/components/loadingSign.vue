@@ -32,8 +32,8 @@ export default {};
 }
 .loadEffect div span {
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   background: rgb(0, 138, 218);
   position: absolute;

@@ -1,19 +1,19 @@
 <template>
-  <div style="margin: -.476rem;height:100%">
-    <div class="Echarts" style="height:100%;">
+  <div style="margin: -.476rem;height:100%" >
+    <div class="Echarts" ref="attBig" style="height:100%;">
       <dv-border-box-12 class="attackLBox">
         <h3 class="chart-title">攻击者分布图</h3>
-        <loadingSign v-if="isLoading" style="top: 51%;left: 28%;"></loadingSign>
+        <loadingSign v-if="isLoading" style="top: 40%;left: 28%;"></loadingSign>
         <div id="attackmap-big" style="height:90%;padding:0 5rem 1rem;"></div>
       </dv-border-box-12>
       <dv-border-box-12 class="attackRBox">
         <h3 class="chart-title">攻击者TOP5</h3>
-        <loadingSign v-if="isLoading" style="top: 39%;left: 75%;"></loadingSign>
+        <loadingSign v-if="isLoading" style="top: 40%;left: 75%;"></loadingSign>
         <div id="attack-top" class="attackTop-item"></div>
       </dv-border-box-12>
       <div class="attack-form">
         <h3 class="chart-title">最新攻击者列表</h3>
-        <loadingSign v-if="isLoading" style="top:76%;left: 75%;"></loadingSign>
+        <loadingSign v-if="isLoading" style="top:76%;left: 44%;"></loadingSign>
         <dv-scroll-board
           :config="chartConfig"
           style="height:70%;padding:0 2rem 3rem"
@@ -49,11 +49,13 @@ export default {
     this.initEchart();
   },
   methods: {
-    async initEchart() {
-      await this.$http.post("/api/Attacker/analysis", null, res => {
+    async initEchart(data) {
+      const _this = this;
+      await this.$http.post("/api/Attacker/analysis", data, res => {
         if (res.data.code === 200) {
           this.isLoading = false;
           this.data = res.data.data;
+          this.processData();
           const myseries = [
             {
               name: "攻击热度",
@@ -65,7 +67,7 @@ export default {
               data: this.data.maps[0]
             },
             {
-              name: "攻击主要类型",
+              name: "攻击链类型",
               type: "map",
               mapType: "world",
               label: {
@@ -117,7 +119,8 @@ export default {
               inRange: {
                 color: ["#FFF", "#8B78F6"]
               },
-              left: 20
+            left: 20,
+            bottom: 50
             },
             series: myseries
           };
@@ -185,7 +188,56 @@ export default {
           });
         }
       });
-    }
+    },
+     processData() {
+      let v = 0;
+      const omIndex = this.data.maps[0].findIndex(
+        element => element.name === "欧盟"
+      );
+      var Europe = [
+        "Austria",
+        "Belgium",
+        "Bulgaria",
+        "Croatia",
+        "Cyprus",
+        "Czech Rep",
+        "Denmark",
+        "Estonia",
+        "Finland",
+        "Greece",
+        "Hungary",
+        "Ireland",
+        "Latvia",
+        "Lithuania",
+        "United Kingdom",
+        "Luxembourg",
+        "Republic of Malta",
+        "Nederland",
+        "Poland",
+        "Portugal",
+        "Slovakia",
+        "Slovenia"
+      ];
+
+      this.data.maps[0].splice(omIndex, 1, {
+        name: Europe[0],
+        value: this.data.maps[0][omIndex].value
+      });
+      for (let i = 1; i < Europe.length; i++)
+        this.data.maps[0].splice(omIndex, 0, {
+          name: Europe[i],
+          value: this.data.maps[0][omIndex].value
+        });
+      this.data.maps[1].splice(omIndex, 1, {
+        name: Europe[0],
+        value: this.data.maps[1][omIndex].value
+      });
+      for (let i = 1; i < Europe.length; i++)
+        this.data.maps[1].splice(omIndex, 0, {
+          name: Europe[i],
+          value: this.data.maps[1][omIndex].value
+        });
+    },
   }
 };
 </script>
@@ -198,7 +250,7 @@ export default {
   background-color: #2259878c;
   border-radius: 1.076923rem;
   width: 56%;
-  height: 69%;
+  height: 48%;
 }
 .attackRBox {
   margin: 0.5rem 3.5rem 0 3.5rem;
@@ -206,16 +258,16 @@ export default {
   border-radius: 1.07rem;
   width: 33%;
   position: relative;
-  top: -70%;
+  top: -49%;
   left: 58%;
-  height: 44%;
+  height: 48%;
 }
 .attack-form {
   position: relative;
-  left: 61%;
-  height: 25%;
-  top: -69.5%;
-  width: 36%;
+  left: 10%;
+  height: 24%;
+  top: -51%;
+  width: 80%;
 }
 .attackTop-item {
   width: 100%;
