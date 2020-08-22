@@ -1,27 +1,32 @@
 <template>
   <div class="Echarts">
-    <dv-border-box-12 class="mainBox">
+    <div class="panel">
       <h3 class="chart-title">{{msg}}分析</h3>
       <loadingSign v-if="isLoading" style="top: 41%;left: 47%;"></loadingSign>
       <div id="chartmap" style="width: 100%;height:69%;"></div>
-      <dv-decoration-7 v-if="isVictim" class="changeBtn">
+      <div class="changeBtn" v-if="isVictim">
         <Button type="info" ghost style="width:100px" @click="changeProfile()">查看攻击者</Button>
-      </dv-decoration-7>
-      <dv-decoration-7 v-else class="changeBtn">
+      </div>
+      <div class="changeBtn" v-else>
         <Button type="info" ghost style="width:100px" @click="changeProfile()">查看受害者</Button>
-      </dv-decoration-7>
+      </div>
       <h3 class="chart-title" style="position: relative;top: -3.5rem;">{{msg}}详细信息</h3>
-      <dv-scroll-board :config="chartConfig" id="vicChart" class="vicChart" />
-    </dv-border-box-12>
+      <!-- <dv-scroll-board :config="chartConfig" id="vicChart" class="vicChart" /> -->
+      <chart-form class="vicChart" :config="chartConfig"></chart-form>
+      <div class="panel-footer"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import loadingSign from "./loadingSign.vue";
+import chartForm from "./chart-form.vue";
+
 export default {
   name: "chartMap",
   components: {
-    loadingSign
+    loadingSign,
+    chartForm
   },
   data() {
     return {
@@ -39,7 +44,7 @@ export default {
   },
   mounted() {
     const myChart = this.$echarts.init(document.getElementById("chartmap"));
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", () => {
       myChart.resize();
     });
     this.initVicEchart();
@@ -63,7 +68,7 @@ export default {
               data: this.data.maps[0]
             },
             {
-              name: "受害主要类型",
+              name: "受害告警类型",
               type: "map",
               mapType: "world",
               label: {
@@ -112,8 +117,8 @@ export default {
               max: 1100000,
               realtime: false,
               calculable: true,
-              inRange: {
-                color: ["#FFF", "#8B78F6"]
+              inRange: { 
+                color: ["#05CBE9", "#3D85FF"]
               },
               left: 20
             },
@@ -121,17 +126,19 @@ export default {
           };
           myChart.setOption(victimOptions);
           this.chartConfig = this.data.latestVictim;
+          this.chartConfig.data = this.chartConfig.data.concat(this.chartConfig.data.slice(0, 5));
           this.chartConfig.rowNum = 2;
           this.chartConfig.hoverPause = true;
+
+          console.log(this.chartConfig)
         }
       });
     },
-    async initAttEchart() {
-      await this.$http.post("/api/Attacker/analysis", null, res => {
+    async initAttEchart(data) {
+      await this.$http.post("/api/Attacker/analysis", data, res => {
         if (res.data.code === 200) {
           this.msg = "攻击者";
           this.data = res.data.data;
-          console.log(this.data);
           const myseries = [
             {
               name: "攻击热度",
@@ -212,11 +219,11 @@ export default {
       });
     },
     processData() {
-      let v = 0;
+      const v = 0;
       const omIndex = this.data.maps[0].findIndex(
         element => element.name === "欧盟"
       );
-      var Europe = [
+      const Europe = [
         "Austria",
         "Belgium",
         "Bulgaria",
@@ -230,12 +237,10 @@ export default {
         "Hungary",
         "Ireland",
         "Latvia",
-        "Lithuania",
         "United Kingdom",
         "Luxembourg",
         "Republic of Malta",
         "Nederland",
-        "Poland",
         "Portugal",
         "Slovakia",
         "Slovenia"
@@ -245,20 +250,22 @@ export default {
         name: Europe[0],
         value: this.data.maps[0][omIndex].value
       });
-      for (let i = 1; i < Europe.length; i++)
+      for (let i = 1; i < Europe.length; i++) {
         this.data.maps[0].splice(omIndex, 0, {
           name: Europe[i],
           value: this.data.maps[0][omIndex].value
         });
+      }
       this.data.maps[1].splice(omIndex, 1, {
         name: Europe[0],
         value: this.data.maps[1][omIndex].value
       });
-      for (let i = 1; i < Europe.length; i++)
+      for (let i = 1; i < Europe.length; i++) {
         this.data.maps[1].splice(omIndex, 0, {
           name: Europe[i],
           value: this.data.maps[1][omIndex].value
         });
+      }
     },
     changeProfile() {
       if (this.isVictim) {

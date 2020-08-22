@@ -1,98 +1,102 @@
 <template>
   <div style="height:100%">
-    <section style="margin:1.538462rem 0;height:100%">
+    <section style="margin:3% 0 3% 0.6%;height:100%">
       <div class="Echarts" style="height:100%">
-        <dv-border-box-12 class="leftBox">
+        <div class="leftBox">
+          <div class="panel">
           <h3 class="chart-title">{{msg}}</h3>
-          <loadingSign v-if="isLoading" style="top: 70%;left: 12%;"></loadingSign>
+          <loadingSign v-if="isLoading" style="top: 69%;left: 13%;"></loadingSign>
           <div id="assChart1" style="width: 100%;height:100%;"></div>
-        </dv-border-box-12>
+          <div class="panel-footer"></div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 </template>
 
 <script>
-import loadingSign from "./loadingSign.vue";
+import loadingSign from './loadingSign.vue';
+
 export default {
-  name: "chartTime",
+  name: 'chartTime',
   components: {
-    loadingSign
+    loadingSign,
   },
   data() {
     return {
-      colors: ["#2EE7FF", "#86FED8", "#0f225E", "#8ac2f8c4"],
+      colors: ['#2EE7FF', '#86FED8', '#0f225E', '#8ac2f8c4'],
       isLoading: true,
-      assData: null
+      assData: null,
     };
   },
   props: {
     msg: String,
     config: Object,
-    data: Array
+    data: Array,
   },
   mounted() {
-    const myChart = this.$echarts.init(document.getElementById("assChart1"));
+    const myChart = this.$echarts.init(document.getElementById('assChart1'));
     this.initEchart();
-    window.addEventListener("resize", function() {
+    window.addEventListener('resize', () => {
       myChart.resize();
     });
   },
   methods: {
     async initEchart(data) {
-      console.log("aaaa");
-      await this.$http.post("/api/RiskAsset/all", data, res => {
+      await this.$http.post('/api/RiskAsset/all', data, (res) => {
         if (res.data.code === 200) {
           this.isLoading = false;
           this.assData = res.data.data;
           const myChart = this.$echarts.init(
-            document.getElementById("assChart1")
+            document.getElementById('assChart1'),
           );
           myChart.setOption({
             color: this.colors,
             tooltip: {
-              trigger: "item",
-              formatter: "{a} <br/>{b}: {c} ({d}%)"
+              trigger: 'item',
+              formatter: '{a} <br/>{b}: {c} ({d}%)',
             },
             legend: {
-              orient: "vertical",
+              orient: 'vertical',
               left: 20,
-              top: 120,
-              data: ["低风险", "已失陷", "高风险"],
+              top: 100,
+              data: ['低风险', '已失陷', '高风险'],
               textStyle: {
-                color: "white"
-              }
+                color: 'white',
+              },
             },
             series: [
               {
-                name: "资产分布",
-                type: "pie",
-                radius: ["40%", "50%"],
+                name: '资产分布',
+                type: 'pie',
+                radius: ['40%', '50%'],
                 top: -60,
                 left: 0,
+                bottom:10,
                 avoidLabelOverlap: false,
                 label: {
                   show: false,
-                  position: "inside"
+                  position: 'inside',
                 },
                 emphasis: {
                   label: {
                     show: true,
-                    fontSize: "30",
-                    fontWeight: "bold"
-                  }
+                    fontSize: '30',
+                    fontWeight: 'bold',
+                  },
                 },
                 labelLine: {
-                  show: false
+                  show: false,
                 },
-                data: this.assData.riskAssetVo2.list
-              }
-            ]
+                data: this.assData.riskAssetVo2.list,
+              },
+            ],
           });
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style scoped lang="scss">

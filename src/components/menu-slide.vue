@@ -1,31 +1,5 @@
 <template>
   <div class="menu">
-    <!-- <Menu theme="dark" width="auto" :class="menuitemClasses">
-          <MenuItem name="1-1" to="/">
-            <Icon type="ios-navigate"></Icon>
-            <span>整体预览</span>
-          </MenuItem>
-          <MenuItem name="1-2" to="/timetrend">
-            <Icon type="search"></Icon>
-            <span>时序分布</span>
-          </MenuItem>
-          <MenuItem name="1-3" to="/assets">
-            <Icon type="settings"></Icon>
-            <span>风险资产</span>
-          </MenuItem>
-          <MenuItem name="1-4" to="/victims">
-            <Icon type="settings"></Icon>
-            <span>受害者</span>
-          </MenuItem>
-          <MenuItem name="1-5" to="/attackers">
-            <Icon type="settings"></Icon>
-            <span>攻击者</span>
-          </MenuItem>
-          <MenuItem name="1-6" to="/topn">
-            <Icon type="settings"></Icon>
-            <span>TOPN</span>
-          </MenuItem>
-    </Menu>-->
     <div class="dropdown">
       <span>Mouse over me</span>
       <div class="dropdown-content">

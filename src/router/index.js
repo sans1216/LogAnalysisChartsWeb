@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import ViewUI from 'view-design';
+
 Vue.use(ViewUI);
 Vue.use(VueRouter);
 
@@ -39,7 +40,7 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
   base: process.env.BASE_URL,
   routes,
 });
@@ -48,11 +49,11 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-router.afterEach(route => {
+router.afterEach((route) => {
   ViewUI.LoadingBar.finish();
 });
 export default router;
-const originalPush = VueRouter.prototype.push
-   VueRouter.prototype.push = function push(location) {
-   return originalPush.call(this, location).catch(err => err)
-}
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch((err) => err);
+};

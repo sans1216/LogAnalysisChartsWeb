@@ -1,15 +1,19 @@
 <template>
   <div class="Echarts">
-    <dv-border-box-12 class="leftBox">
-      <h3 class="chart-title">{{msg}}</h3>
-      <loadingSign v-if="isLoading" style="top: 32%;left: 12%;"></loadingSign>
-      <div id="chart1" style="width: 100%;height:16rem;"></div>
-    </dv-border-box-12>
+    <div class="leftBox">
+      <div class="panel">
+        <h3 class="chart-title">{{msg}}</h3>
+        <loadingSign v-if="isLoading" style="top: 33%;left: 13%;"></loadingSign>
+        <div id="chart1" style="width: 100%;height:16rem;"></div>
+      </div>
+      <div class="panel-footer"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import loadingSign from "./loadingSign.vue";
+
 const cors = require("cors");
 
 export default {
@@ -19,7 +23,7 @@ export default {
   },
   data() {
     return {
-      colors: ["#8B78F6", "#56D0E3", "#F57474"],
+      colors: ["#86fed8","#14e9ff", "#015bff"],
       timeData: [],
       data: null,
       isLoading: true
@@ -37,7 +41,7 @@ export default {
     }
 
     const myChart = this.$echarts.init(document.getElementById("chart1"));
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", () => {
       myChart.resize();
     });
   },
@@ -72,7 +76,7 @@ export default {
             grid: {
               left: "8%",
               right: "8%",
-              bottom: "20%",
+              bottom: "30%",
               containLabel: true
             },
             toolbox: {
@@ -119,20 +123,7 @@ export default {
                 }
               }
             ],
-            dataZoom: [
-              {
-                show: true,
-                realtime: true,
-                start: 30,
-                end: 70
-              },
-              {
-                type: "inside",
-                realtime: true,
-                start: 30,
-                end: 70
-              }
-            ],
+
             series: [
               {
                 name: "高风险",

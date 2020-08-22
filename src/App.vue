@@ -47,42 +47,29 @@
         <p class="title">分析报告可视化面板展示</p>
       </div>
       <div class="tools" ref="tools">
-        <TimePicker
-          v-if="!isFullScreen"
-          confirm
-          v-model="time"
-          @on-change="changeTime"
-          type="timerange"
-          placement="bottom-end"
-          size="large"
-          placeholder="时间选择"
-          style="width: 8rem;"
-          hide-disabled-options
-          :disabled-seconds="seconds"
-        ></TimePicker>
+         <DatePicker type="datetimerange" :disabled-seconds="seconds"
+         format="yyyy-MM-dd HH:mm:ss" @on-change="time=$event" v-model="time" placeholder="选择时间" style="width: 8rem"></DatePicker>
         <Button
           type="info"
           ghost
-          size="large"
           @click="reDraw"
-          style="margin:1.4rem"
+          style="margin:1.2rem"
           v-if="!isFullScreen"
         >生成报表</Button>
         <Button
           type="info"
           ghost
-          size="large"
+          href = "http://10.11.40.91:8080/report/download"
           @click="exportFile"
-          style="margin-left:0.15rem"
+          style="margin-left:0.1rem"
           v-if="!isFullScreen"
         >导出</Button>
         <Button
           type="info"
           ghost
-          size="large"
           v-if="!isFullScreen"
           @click="getFullScreen"
-          style="margin-left:1.4rem"
+          style="margin-left:1.2rem"
         >全屏显示</Button>
         <Button
           type="info"
@@ -92,7 +79,7 @@
           @click="leaveFullScreen"
           style="margin-left:1.4rem"
         >退出全屏</Button>
-        <ColorPicker size="large" style="margin-left:1.5rem" v-model="color" @on-change="changeBG" />
+
       </div>
       <div style="height:100%">
         <router-view ref="content" :key="$route.path"></router-view>
@@ -112,7 +99,9 @@ export default {
   data() {
     return {
       color: "",
-      time: "",
+      startTime:'',
+      endTime:'',
+      time:null,
       seconds: [
         0,
         1,
@@ -187,6 +176,7 @@ export default {
     reDraw() {
       let path = this.$route.path;
       if (path === "/") {
+        this.time = {'startTime':this.time[0],'endTime':this.time[1]}
         console.log(this.time);
         this.$refs.content.$refs.asset.initEchart(this.time);
         this.$refs.content.$refs.map.initAttEchart(this.time);
@@ -205,20 +195,20 @@ export default {
         this.$refs.content.$refs.timeBig.__vue__.initEchart(this.time);
       }
     },
-    exportFile() {
-      console.log("导出表格");
+    async exportFile() {
+      window.location.href='http://47.115.43.39:8080/report/download';
     },
-    changeBG() {
-      console.log(this.color)
-      if (this.color != '') {
-        this.data_IsImage = false;
-        this.$refs.bg.style.background = this.color;
-      }else{
-        this.data_IsImage = true;
-        this.$refs.bg.style.backgroundImage = bgPic;
-        console.log(this.$refs.bg.style.backgroundImage)
-      }
-    },
+    // changeBG() {
+    //   console.log(this.color)
+    //   if (this.color != '') {
+    //     this.data_IsImage = false;
+    //     this.$refs.bg.style.background = this.color;
+    //   }else{
+    //     this.data_IsImage = true;
+    //     this.$refs.bg.style.backgroundImage = bgPic;
+    //     console.log(this.$refs.bg.style.backgroundImage)
+    //   }
+    // },
     getFullScreen() {
       this.isFullScreen = true;
       this.FullCreeen(document.documentElement);
@@ -226,7 +216,6 @@ export default {
     leaveFullScreen() {
       this.isFullScreen = false;
       this.outFullCreeen(document);
-      console.log(this.isFullScreen);
     },
     FullCreeen(element) {
       this.$refs.tools.style.margin = "1.8% 41%";
@@ -248,8 +237,8 @@ export default {
     },
     //退出全屏的方法
     outFullCreeen(element) {
-      this.$refs.tools.style.margin = "0.4% 31%";
-      this.$refs.tools.style.height = "4rem";
+      this.$refs.tools.style.margin = " 0 36% 0.7% 36%";
+      this.$refs.tools.style.height = "3.7rem";
       let el = element;
       let cfs =
         el.cancelFullScreen ||
@@ -296,8 +285,8 @@ export default {
   left: 21%;
 }
 .tools {
-  margin: 0.4% 31%;
-  height: 4rem;
+  margin: 0 36% 0.7% 36%;
+  height: 3.7rem;
 }
 
 .menu-l {

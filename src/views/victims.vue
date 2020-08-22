@@ -1,40 +1,45 @@
 <template>
   <div style="margin: -.476rem;height:100%" ref="vicBig">
     <div class="Echarts" style="height:100%;">
-      <dv-border-box-12 class="victimLBox">
-        <h3 class="chart-title">受害者分布图</h3>
-        <loadingSign v-if="isLoading" style="top: 40%;left: 28%;"></loadingSign>
-        <div id="victimmap-big" style="height:90%;width:100%;padding:0 5rem 1rem;"></div>
-      </dv-border-box-12>
-      <dv-border-box-12 class="victimRBox">
-        <h3 class="chart-title">受害者TOP5</h3>
-        <loadingSign v-if="isLoading" style="top: 40%;left: 75%;"></loadingSign>
-        <div id="victim-top" class="victimTop-item"></div>
-      </dv-border-box-12>
+      <div class="victimLBox">
+        <div class="panel">
+          <h3 class="chart-title">受害者分布图</h3>
+          <loadingSign v-if="isLoading" style="top: 40%;left: 28%;"></loadingSign>
+          <div id="victimmap-big" style="height:90%;width:100%;padding:0 5rem 1rem;"></div>
+          <div class="panel-footer"></div>
+        </div>
+      </div>
+      <div class="victimRBox">
+        <div class="panel">
+          <h3 class="chart-title">受害者TOP5</h3>
+          <loadingSign v-if="isLoading" style="top: 40%;left: 75%;"></loadingSign>
+          <div id="victim-top" class="victimTop-item"></div>
+          <div class="panel-footer"></div>
+        </div>
+      </div>
       <div class="victim-form">
-        <h3 class="chart-title" >最新受害者列表</h3>
-        <loadingSign v-if="isLoading" style="top:76%;left: 44%;"></loadingSign>
-        <dv-scroll-board
-          :config="chartConfig"
-          style="height:70%;padding:0 2rem 3rem"
-          id="vicChart"
-        />
+        <h3 class="chart-title">最新受害者列表</h3>
+        <loadingSign v-if="isLoading" style="top:77%;left: 44%;"></loadingSign>
+        <chart-form :config="chartConfig" style="height:90%;padding:0 2rem 3rem" id="vicChart"></chart-form>
       </div>
     </div>
   </div>
 </template>
 <script>
 import loadingSign from "../components/loadingSign";
+import chartForm from "../components/chart-form.vue";
+
 export default {
   components: {
-    loadingSign
+    loadingSign,
+    chartForm
   },
   data() {
     return {
       data: null,
       victimData: null,
       chartConfig: null,
-      isLoading:true,
+      isLoading: true
     };
   },
   mounted() {
@@ -43,7 +48,7 @@ export default {
     );
     const myChart1 = this.$echarts.init(document.getElementById("victim-top"));
 
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", () => {
       myChart.resize();
       myChart1.resize();
     });
@@ -65,7 +70,7 @@ export default {
             data: this.data.maps[0]
           },
           {
-            name: "受害主要类型",
+            name: "受害告警类型",
             type: "map",
             mapType: "world",
             label: {
@@ -126,6 +131,9 @@ export default {
         mapChart.setOption(victimOptions);
         this.chartConfig = this.data.latestVictim;
         this.chartConfig.rowNum = 3;
+        this.chartConfig.data = this.chartConfig.data.concat(
+          this.chartConfig.data.slice(0, 5)
+        );
         const victimtop = this.$echarts.init(
           document.getElementById("victim-top")
         );
@@ -152,12 +160,12 @@ export default {
               },
               lineStyle: {
                 type: "solid",
-                color: "#fff", //左边线的颜色
-                width: "2" //坐标线的宽度
+                color: "#fff", // 左边线的颜色
+                width: "2" // 坐标线的宽度
               },
               axisLabel: {
                 textStyle: {
-                  color: "#fff" //坐标值得具体的颜色
+                  color: "#fff" // 坐标值得具体的颜色
                 }
               }
             }
@@ -167,7 +175,7 @@ export default {
               type: "value",
               axisLabel: {
                 textStyle: {
-                  color: "#fff" //坐标值得具体的颜色
+                  color: "#fff" // 坐标值得具体的颜色
                 }
               }
             }
@@ -187,12 +195,12 @@ export default {
         });
       });
     },
-     processData() {
-      let v = 0;
+    processData() {
+      const v = 0;
       const omIndex = this.data.maps[0].findIndex(
         element => element.name === "欧盟"
       );
-      var Europe = [
+      const Europe = [
         "Austria",
         "Belgium",
         "Bulgaria",
@@ -206,12 +214,10 @@ export default {
         "Hungary",
         "Ireland",
         "Latvia",
-        "Lithuania",
         "United Kingdom",
         "Luxembourg",
         "Republic of Malta",
         "Nederland",
-        "Poland",
         "Portugal",
         "Slovakia",
         "Slovenia"
@@ -221,21 +227,23 @@ export default {
         name: Europe[0],
         value: this.data.maps[0][omIndex].value
       });
-      for (let i = 1; i < Europe.length; i++)
+      for (let i = 1; i < Europe.length; i++) {
         this.data.maps[0].splice(omIndex, 0, {
           name: Europe[i],
           value: this.data.maps[0][omIndex].value
         });
+      }
       this.data.maps[1].splice(omIndex, 1, {
         name: Europe[0],
         value: this.data.maps[1][omIndex].value
       });
-      for (let i = 1; i < Europe.length; i++)
+      for (let i = 1; i < Europe.length; i++) {
         this.data.maps[1].splice(omIndex, 0, {
           name: Europe[i],
           value: this.data.maps[1][omIndex].value
         });
-    },
+      }
+    }
   }
 };
 </script>
@@ -244,15 +252,13 @@ export default {
   width: 100%;
 }
 .victimLBox {
-  margin: 1rem 0 0 4.6rem;
-  background-color: #2259878c;
+  margin: 0.6rem 0 0.3rem 4.6rem;
   border-radius: 1.076923rem;
   width: 56%;
   height: 48%;
 }
 .victimRBox {
-  margin: 0.5rem 3.5rem 0 3.5rem;
-  background-color: #2259878c;
+  margin: 0.5rem 3.5rem 0.3rem 3.5rem;
   border-radius: 1.07rem;
   width: 33%;
   position: relative;
@@ -263,8 +269,8 @@ export default {
 .victim-form {
   position: relative;
   left: 10%;
-  height: 24%;
-  top: -51%;
+  height: 23%;
+  top: -50%;
   width: 80%;
 }
 .victimTop-item {

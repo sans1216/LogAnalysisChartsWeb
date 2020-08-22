@@ -17,12 +17,11 @@ Vue.use(ViewUI);
 Vue.use(dataV);
 Vue.config.warnHandler = function (msg) {
   if (!msg.includes('Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders.')) { // uniApp bug: https://ask.dcloud.net.cn/question/71966
-    return console.warn && console.warn(msg)
+    return console.warn && console.warn(msg);
   }
-}
+};
 new Vue({
   router,
   store,
   render: (h) => h(App),
 }).$mount('#app');
-

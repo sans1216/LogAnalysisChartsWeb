@@ -1,19 +1,23 @@
 <template>
   <div style="width: 28%;">
     <section>
-      <dv-border-box-12 class="rightBox">
-        <h3 class="chart-title" style="padding-top:2rem">攻击链TOP5</h3>
-        <loadingSign v-if="isLoading" style="top:35%;left:81%"></loadingSign>
-        <div id="chartTopn1" class="topnItem" style="width: 100%;height:11rem;"></div>
-        <h3 class="chart-title">被害设备TOP5</h3>
-        <loadingSign v-if="isLoading" style="top:65%;left:81%"></loadingSign>
-        <div id="chartTopn2" class="topnItem" style="width: 100%;height:11rem;"></div>
-      </dv-border-box-12>
+      <div class="rightBox">
+        <div class="panel">
+          <h3 class="chart-title">攻击链TOP5</h3>
+          <loadingSign v-if="isLoading" style="top:31%;left:81%"></loadingSign>
+          <div id="chartTopn1" class="topnItem" style="width: 100%;height:11rem;"></div>
+          <h3 class="chart-title">被害设备TOP5</h3>
+          <loadingSign v-if="isLoading" style="top:62%;left:81%"></loadingSign>
+          <div id="chartTopn2" class="topnItem" style="width: 100%;height:11rem;"></div>
+          <div class="panel-footer"></div>
+        </div>
+      </div>
     </section>
   </div>
 </template>
 <script>
 import loadingSign from "./loadingSign.vue";
+
 export default {
   name: "chartTime",
   components: {
@@ -31,7 +35,7 @@ export default {
     this.initEchart();
     const myChart = this.$echarts.init(document.getElementById("chartTopn1"));
     const myChart2 = this.$echarts.init(document.getElementById("chartTopn2"));
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", () => {
       myChart.resize();
       myChart2.resize();
     });
@@ -48,11 +52,11 @@ export default {
           const myChart2 = this.$echarts.init(
             document.getElementById("chartTopn2")
           );
-          let chartArray = [myChart, myChart2];
+          const chartArray = [myChart, myChart2];
           for (let i = 0; i < chartArray.length; i++) {
-            let data = this.data.topN[i].data;
-            let titlename = this.data.topN[i].titleName;
-            let valdata = this.data.topN[i].valdata;
+            const { data } = this.data.topN[i];
+            const titlename = this.data.topN[i].titleName;
+            const { valdata } = this.data.topN[i];
 
             const myColor = [
               "#1089E7",
@@ -61,11 +65,11 @@ export default {
               "#F8B448",
               "#8B78F6"
             ];
-            let option = {
+            const option = {
               // 图标位置
               grid: {
                 top: "10%",
-                left: "35%",
+                left: "45%",
                 right: "20%",
                 bottom: "10%"
               },
@@ -103,7 +107,7 @@ export default {
                 {
                   show: true,
                   inverse: true,
-                  data: data,
+                  data,
                   axisLabel: {
                     textStyle: {
                       fontSize: 12,
@@ -117,7 +121,7 @@ export default {
                   name: "条",
                   type: "bar",
                   yAxisIndex: 0,
-                  data: data,
+                  data,
                   barCategoryGap: 50,
                   barWidth: 10,
                   itemStyle: {
@@ -142,7 +146,7 @@ export default {
                   type: "bar",
                   yAxisIndex: 1,
                   barCategoryGap: 50,
-                  data: data,
+                  data,
                   barWidth: 15,
                   itemStyle: {
                     normal: {
