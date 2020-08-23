@@ -5,10 +5,17 @@
         <div class="panel">
           <h3 class="chart-title">攻击链TOP5</h3>
           <loadingSign v-if="isLoading" style="top:31%;left:81%"></loadingSign>
-          <div id="chartTopn1" class="topnItem" style="width: 100%;height:11rem;"></div>
+          <div>
+            <div
+
+              id="chartTopn1"
+              class="topnItem"
+              style="width: 100%;height:11rem;"
+            ></div>
+          </div>
           <h3 class="chart-title">被害设备TOP5</h3>
           <loadingSign v-if="isLoading" style="top:62%;left:81%"></loadingSign>
-          <div id="chartTopn2" class="topnItem" style="width: 100%;height:11rem;"></div>
+          <div  id="chartTopn2" class="topnItem" style="width: 100%;height:11rem;"></div>
           <div class="panel-footer"></div>
         </div>
       </div>
@@ -25,7 +32,9 @@ export default {
   },
   data() {
     return {
-      isLoading: true
+      isLoading: true,
+      haveData1: true,
+      haveData2: true
     };
   },
   props: {
@@ -41,11 +50,35 @@ export default {
     });
   },
   methods: {
-    async initEchart(data) {
-      await this.$http.post("/api/Attacker/topN", data, res => {
+    async initEchart() {
+      let params = {
+        startTime: this.$parent.$parent.time.startTime,
+        endTime: this.$parent.$parent.time.endTime
+      };
+      if (this.$parent.$parent.time.startTime === undefined) {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http.post("/Attacker/topN", params).then(res => {
         if (res.data.code == 200) {
           this.isLoading = false;
           this.data = res.data.data;
+          let flag = false;
+          for (let i = 0; i < res.data.data.topN[0].data.length; i++) {
+            if (res.data.data.topN[0].data[i] != 0) {
+              flag = true;
+            }
+            if(flag == false) this.haveData1 = false;
+          }
+          for (let i = 0; i < res.data.data.topN[1].data.length; i++) {
+            if (res.data.data.topN[1].data[i] != 0) {
+              flag = true;
+            }
+            if(flag == false) this.haveData2 = false;
+          }
+          console.log(this.haveData1, this.haveData2);
           const myChart = this.$echarts.init(
             document.getElementById("chartTopn1")
           );
@@ -173,5 +206,11 @@ export default {
   height: 11rem;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+}
+.noDataInfo {
+  width: 100%;
+  height: 100%;
+  color: #2ccbef;
+  padding: 0% 32% 0 41%;
 }
 </style>

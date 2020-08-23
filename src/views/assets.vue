@@ -57,7 +57,17 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      await this.$http.post("/api/RiskAsset/all", data, res => {
+      let params = {
+        startTime: this.$parent.time.startTime,
+        endTime: this.$parent.time.endTime
+      };
+      if (this.$parent.time.startTime === undefined) {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http.post("/RiskAsset/all", params).then(res => {
         const numsChart = this.$echarts.init(
           document.getElementById("assChart1")
         );
@@ -67,7 +77,13 @@ export default {
         const titlename = this.assData.riskAssetVo3.titleName;
         const { data } = this.assData.riskAssetVo3;
         const valdata = this.assData.riskAssetVo3.valData;
-        const myColor = ["#2EE7FF", "#86FED8","#8ac2f8c4","#8B78F6","#0f225E"];
+        const myColor = [
+          "#2EE7FF",
+          "#86FED8",
+          "#8ac2f8c4",
+          "#8B78F6",
+          "#0f225E"
+        ];
         const topOption = {
           // 图标位置
           grid: {

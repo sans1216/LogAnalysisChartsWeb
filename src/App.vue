@@ -47,19 +47,21 @@
         <p class="title">分析报告可视化面板展示</p>
       </div>
       <div class="tools" ref="tools">
-         <DatePicker type="datetimerange" :disabled-seconds="seconds"
-         format="yyyy-MM-dd HH:mm:ss" @on-change="time=$event" v-model="time" placeholder="选择时间" style="width: 8rem"></DatePicker>
+        <DatePicker
+          type="datetimerange"
+          :disabled-seconds="seconds"
+          ref="time"
+          format="yyyy-MM-dd HH:mm:ss"
+          @on-change="time=$event"
+          v-model="time"
+          placeholder="选择时间"
+          style="width: 8rem"
+        ></DatePicker>
+        <Button type="info" ghost @click="reDraw" style="margin:1.2rem" v-if="!isFullScreen">生成报表</Button>
         <Button
           type="info"
           ghost
-          @click="reDraw"
-          style="margin:1.2rem"
-          v-if="!isFullScreen"
-        >生成报表</Button>
-        <Button
-          type="info"
-          ghost
-          href = "http://10.11.40.91:8080/report/download"
+          href="http://10.11.40.91:8080/report/download"
           @click="exportFile"
           style="margin-left:0.1rem"
           v-if="!isFullScreen"
@@ -79,7 +81,6 @@
           @click="leaveFullScreen"
           style="margin-left:1.4rem"
         >退出全屏</Button>
-
       </div>
       <div style="height:100%">
         <router-view ref="content" :key="$route.path"></router-view>
@@ -90,7 +91,7 @@
 <script>
 import Pointwave from "@/components/Pointwave";
 import loadingSign from "@/components/loadingSign";
-import bgPic from "@/assets/images/bg1.png"
+import bgPic from "@/assets/images/bg1.png";
 export default {
   components: {
     Pointwave,
@@ -99,9 +100,7 @@ export default {
   data() {
     return {
       color: "",
-      startTime:'',
-      endTime:'',
-      time:null,
+      time: null,
       seconds: [
         0,
         1,
@@ -170,45 +169,60 @@ export default {
       isFullScreen: false
     };
   },
-  created() {},
   methods: {
     changeTime() {},
     reDraw() {
       let path = this.$route.path;
+      this.time = { startTime: this.time[0], endTime: this.time[1] };
+      console.log(this.time);
+      const time2 = JSON.stringify(this.time);
+      console.log(time2);
       if (path === "/") {
-        this.time = {'startTime':this.time[0],'endTime':this.time[1]}
-        console.log(this.time);
-        this.$refs.content.$refs.asset.initEchart(this.time);
-        this.$refs.content.$refs.map.initAttEchart(this.time);
-        this.$refs.content.$refs.map.initVicEchart(this.time);
-        this.$refs.content.$refs.topn.initEchart(this.time);
-        this.$refs.content.$refs.time.initEchart(this.time);
-      } else if(path ==="/victims") {
-        this.$refs.content.$refs.vicBig.__vue__.initEchart(this.time);
-      } else if(path ==="/attackers") {
-        this.$refs.content.$refs.attBig.__vue__.initEchart(this.time);
-      } else if(path ==="/topn") {
-        this.$refs.content.$refs.topnBig.__vue__.initEchart(this.time);
-      } else if(path ==="/assets") {
-        this.$refs.content.$refs.assetBig.__vue__.initEchart(this.time);
-      } else if(path ==="/timetrend") {
-        this.$refs.content.$refs.timeBig.__vue__.initEchart(this.time);
+        this.$refs.content.$refs.asset.initEchart(time2);
+        this.$refs.content.$refs.map.initAttEchart(time2);
+        this.$refs.content.$refs.map.initVicEchart(time2);
+        this.$refs.content.$refs.topn.initEchart(time2);
+        this.$refs.content.$refs.time.initEchart(time2);
+      } else if (path === "/victims") {
+        this.$refs.content.$refs.vicBig.__vue__.initEchart(time2);
+      } else if (path === "/attackers") {
+        this.$refs.content.$refs.attBig.__vue__.initEchart(time2);
+      } else if (path === "/topn") {
+        this.$refs.content.$refs.topnBig.__vue__.initEchart(time2);
+      } else if (path === "/assets") {
+        this.$refs.content.$refs.assetBig.__vue__.initEchart(time2);
+      } else if (path === "/timetrend") {
+        this.$refs.content.$refs.timeBig.__vue__.initEchart(time2);
       }
     },
     async exportFile() {
-      window.location.href='http://47.115.43.39:8080/report/download';
+      // window.location.href = "http://47.115.43.39:8080/report/download/";
+      let params = {
+        startTime: this.time[0],
+        endTime: this.time[1]
+      };
+      if (this.time[0] === "") {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http
+        .post("/report/download", params, { responseType: "blob" })
+        .then(res => {
+          var blob = new Blob([res.data]);
+          var downloadElement = document.createElement("a");
+          var href = window.URL.createObjectURL(blob); //创建下载的链接
+          downloadElement.href = href;
+          downloadElement.download = "用户数据.docx"; //下载后文件名
+          document.body.appendChild(downloadElement);
+          downloadElement.click(); //点击下载
+          document.body.removeChild(downloadElement); //下载完成移除元素
+          window.URL.revokeObjectURL(href); //释放掉blob对象
+        });
+
     },
-    // changeBG() {
-    //   console.log(this.color)
-    //   if (this.color != '') {
-    //     this.data_IsImage = false;
-    //     this.$refs.bg.style.background = this.color;
-    //   }else{
-    //     this.data_IsImage = true;
-    //     this.$refs.bg.style.backgroundImage = bgPic;
-    //     console.log(this.$refs.bg.style.backgroundImage)
-    //   }
-    // },
+
     getFullScreen() {
       this.isFullScreen = true;
       this.FullCreeen(document.documentElement);

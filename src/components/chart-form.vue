@@ -20,15 +20,6 @@ export default {
   data() {
     return {};
   },
-  mounted() {
-    for (let i = 0; i < this.config.data.length; i++) {
-          this.config.data = this.config.data.concat(
-            this.config.data.slice(0, 5)
-          );
-        }
-
-    console.log(this.config.data);
-  },
   props: {
     config: Object
   }

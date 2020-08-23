@@ -5,6 +5,7 @@
         <h3 class="chart-title">{{msg}}</h3>
         <loadingSign v-if="isLoading" style="top: 33%;left: 13%;"></loadingSign>
         <div id="chart1" style="width: 100%;height:16rem;"></div>
+        <!-- <div v-if="!haveData" class="noDataInfo">未获取到数据</div> -->
       </div>
       <div class="panel-footer"></div>
     </div>
@@ -23,10 +24,11 @@ export default {
   },
   data() {
     return {
-      colors: ["#86fed8","#14e9ff", "#015bff"],
+      colors: ["#86fed8", "#14e9ff", "#015bff"],
       timeData: [],
       data: null,
-      isLoading: true
+      isLoading: true,
+      haveData: true
     };
   },
   props: {
@@ -47,11 +49,25 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      await this.$http.post("/api/DistributionTrend/all", data, res => {
+      let params = {
+        startTime: this.$parent.$parent.time.startTime,
+        endTime: this.$parent.$parent.time.endTime
+      };
+      if (this.$parent.$parent.time.startTime === undefined) {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http.post("/DistributionTrend/all", params).then(res => {
         if (res.data.code == 200) {
           this.isLoading = false;
           this.data = res.data.data;
           this.timeData = res.data.data.list;
+          if (res.data.data.high.length == 0) {
+            this.haveData = false;
+          }
+          console.log(this.haveData)
           const myChart = this.$echarts.init(document.getElementById("chart1"));
           const timeData = this.timeData.map(str => str.replace("2020/", ""));
           const option = {
@@ -159,4 +175,11 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+.noDataInfo {
+  width: 100%;
+  height: 100%;
+  margin-top: 5%;
+  color: #2ccbef;
+  padding: 1% 34% 0 37%;
+}
 </style>

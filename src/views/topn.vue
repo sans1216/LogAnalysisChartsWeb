@@ -54,7 +54,17 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      await this.$http.post("/api/Attacker/topN", data, res => {
+      let params = {
+        startTime: this.$parent.time.startTime,
+        endTime: this.$parent.time.endTime
+      };
+      if (this.$parent.time.startTime === undefined) {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http.post("/Attacker/topN", params).then(res => {
         if (res.data.code === 200) {
           this.isLoading = false;
           this.data = res.data.data;
@@ -75,7 +85,13 @@ export default {
             const { data } = this.data.topN[i];
             const titlename = this.data.topN[i].titleName;
             const { valdata } = this.data.topN[i];
-            const myColor = ["#2EE7FF", "#86FED8","#8ac2f8c4","#8B78F6","#0f225E"];
+            const myColor = [
+              "#2EE7FF",
+              "#86FED8",
+              "#8ac2f8c4",
+              "#8B78F6",
+              "#0f225E"
+            ];
             const option = {
               // 图标位置
               grid: {

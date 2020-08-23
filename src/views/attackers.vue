@@ -55,8 +55,17 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      const _this = this;
-      await this.$http.post("/api/Attacker/analysis", data, res => {
+      let params = {
+        startTime: this.$parent.time.startTime,
+        endTime: this.$parent.time.endTime
+      };
+      if (this.$parent.time.startTime === undefined) {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http.post("/Attacker/analysis", params).then(res => {
         if (res.data.code === 200) {
           this.isLoading = false;
           this.data = res.data.data;
@@ -133,8 +142,8 @@ export default {
           this.chartConfig = this.data.latestAttacker;
           this.chartConfig.rowNum = 3;
           this.chartConfig.data = this.chartConfig.data.concat(
-          this.chartConfig.data.slice(0, 5)
-        );
+            this.chartConfig.data.slice(0, 5)
+          );
           const attacktop = this.$echarts.init(
             document.getElementById("attack-top")
           );
@@ -198,52 +207,54 @@ export default {
       });
     },
     processData() {
-      const v = 0;
-      const omIndex = this.data.maps[0].findIndex(
-        element => element.name === "欧盟"
-      );
-      const Europe = [
-        "Austria",
-        "Belgium",
-        "Bulgaria",
-        "Croatia",
-        "Cyprus",
-        "Czech Rep",
-        "Denmark",
-        "Estonia",
-        "Finland",
-        "Greece",
-        "Hungary",
-        "Ireland",
-        "Latvia",
-        "United Kingdom",
-        "Luxembourg",
-        "Republic of Malta",
-        "Nederland",
-        "Portugal",
-        "Slovakia",
-        "Slovenia"
-      ];
+      if (this.data.maps[0][0] != undefined) {
+        const v = 0;
+        const omIndex = this.data.maps[0].findIndex(
+          element => element.name === "欧盟"
+        );
+        const Europe = [
+          "Austria",
+          "Belgium",
+          "Bulgaria",
+          "Croatia",
+          "Cyprus",
+          "Czech Rep",
+          "Denmark",
+          "Estonia",
+          "Finland",
+          "Greece",
+          "Hungary",
+          "Ireland",
+          "Latvia",
+          "United Kingdom",
+          "Luxembourg",
+          "Republic of Malta",
+          "Nederland",
+          "Portugal",
+          "Slovakia",
+          "Slovenia"
+        ];
 
-      this.data.maps[0].splice(omIndex, 1, {
-        name: Europe[0],
-        value: this.data.maps[0][omIndex].value
-      });
-      for (let i = 1; i < Europe.length; i++) {
-        this.data.maps[0].splice(omIndex, 0, {
-          name: Europe[i],
+        this.data.maps[0].splice(omIndex, 1, {
+          name: Europe[0],
           value: this.data.maps[0][omIndex].value
         });
-      }
-      this.data.maps[1].splice(omIndex, 1, {
-        name: Europe[0],
-        value: this.data.maps[1][omIndex].value
-      });
-      for (let i = 1; i < Europe.length; i++) {
-        this.data.maps[1].splice(omIndex, 0, {
-          name: Europe[i],
+        for (let i = 1; i < Europe.length; i++) {
+          this.data.maps[0].splice(omIndex, 0, {
+            name: Europe[i],
+            value: this.data.maps[0][omIndex].value
+          });
+        }
+        this.data.maps[1].splice(omIndex, 1, {
+          name: Europe[0],
           value: this.data.maps[1][omIndex].value
         });
+        for (let i = 1; i < Europe.length; i++) {
+          this.data.maps[1].splice(omIndex, 0, {
+            name: Europe[i],
+            value: this.data.maps[1][omIndex].value
+          });
+        }
       }
     }
   }

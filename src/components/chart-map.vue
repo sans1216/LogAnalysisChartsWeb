@@ -4,6 +4,7 @@
       <h3 class="chart-title">{{msg}}分析</h3>
       <loadingSign v-if="isLoading" style="top: 41%;left: 47%;"></loadingSign>
       <div id="chartmap" style="width: 100%;height:69%;"></div>
+      <!-- <div class="noDataInfo" style="width: 100%;height:69%;">未获取到数据</div> -->
       <div class="changeBtn" v-if="isVictim">
         <Button type="info" ghost style="width:100px" @click="changeProfile()">查看攻击者</Button>
       </div>
@@ -11,8 +12,8 @@
         <Button type="info" ghost style="width:100px" @click="changeProfile()">查看受害者</Button>
       </div>
       <h3 class="chart-title" style="position: relative;top: -3.5rem;">{{msg}}详细信息</h3>
-      <!-- <dv-scroll-board :config="chartConfig" id="vicChart" class="vicChart" /> -->
       <chart-form class="vicChart" :config="chartConfig"></chart-form>
+      <!-- <div  class="noDataInfo" style="width: 100%;height:69%;">未获取到数据</div> -->
       <div class="panel-footer"></div>
     </div>
   </div>
@@ -35,7 +36,9 @@ export default {
       anotherconfig: this.config,
       attackerOptions: null,
       data: null,
-      isLoading: true
+      isLoading: true,
+      haveData: true,
+      haveData2:false,
     };
   },
   props: {
@@ -51,12 +54,25 @@ export default {
   },
   methods: {
     async initVicEchart(data) {
-      await this.$http.post("/api/Victim/analysis", data, res => {
+      let params = {
+        startTime: this.$parent.$parent.time.startTime,
+        endTime: this.$parent.$parent.time.endTime
+      };
+      if (this.$parent.$parent.time.startTime === undefined) {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http.post("/Victim/analysis", params).then(res => {
         if (res.data.code === 200) {
           this.isLoading = false;
           this.msg = "受害者";
           this.data = res.data.data;
           this.processData();
+          if (res.data.data.maps[0].length == 0) {
+            this.haveData = false;
+          }
           const myseries = [
             {
               name: "受害热度",
@@ -117,8 +133,8 @@ export default {
               max: 1100000,
               realtime: false,
               calculable: true,
-              inRange: { 
-                color: ["#05CBE9", "#3D85FF"]
+              inRange: {
+                color: ["#05CBE9", "#3D85FF"]
               },
               left: 20
             },
@@ -126,19 +142,33 @@ export default {
           };
           myChart.setOption(victimOptions);
           this.chartConfig = this.data.latestVictim;
-          this.chartConfig.data = this.chartConfig.data.concat(this.chartConfig.data.slice(0, 5));
+          this.chartConfig.data = this.chartConfig.data.concat(
+            this.chartConfig.data.slice(0, 5)
+          );
           this.chartConfig.rowNum = 2;
           this.chartConfig.hoverPause = true;
 
-          console.log(this.chartConfig)
         }
       });
     },
     async initAttEchart(data) {
-      await this.$http.post("/api/Attacker/analysis", data, res => {
+      let params = {
+        startTime: this.$parent.$parent.time.startTime,
+        endTime: this.$parent.$parent.time.endTime
+      };
+      if (this.$parent.$parent.time.startTime === undefined) {
+        params = {
+          startTime: null,
+          endTime: null
+        };
+      }
+      await this.$http.post("/Attacker/analysis", params).then(res => {
         if (res.data.code === 200) {
           this.msg = "攻击者";
           this.data = res.data.data;
+          if (res.data.data.maps[0].length == 0) {
+            this.haveData = false;
+          }
           const myseries = [
             {
               name: "攻击热度",
@@ -219,52 +249,54 @@ export default {
       });
     },
     processData() {
-      const v = 0;
-      const omIndex = this.data.maps[0].findIndex(
-        element => element.name === "欧盟"
-      );
-      const Europe = [
-        "Austria",
-        "Belgium",
-        "Bulgaria",
-        "Croatia",
-        "Cyprus",
-        "Czech Rep",
-        "Denmark",
-        "Estonia",
-        "Finland",
-        "Greece",
-        "Hungary",
-        "Ireland",
-        "Latvia",
-        "United Kingdom",
-        "Luxembourg",
-        "Republic of Malta",
-        "Nederland",
-        "Portugal",
-        "Slovakia",
-        "Slovenia"
-      ];
+      if (this.data.maps[0][0] != undefined) {
+        const v = 0;
+        const omIndex = this.data.maps[0].findIndex(
+          element => element.name === "欧盟"
+        );
+        const Europe = [
+          "Austria",
+          "Belgium",
+          "Bulgaria",
+          "Croatia",
+          "Cyprus",
+          "Czech Rep",
+          "Denmark",
+          "Estonia",
+          "Finland",
+          "Greece",
+          "Hungary",
+          "Ireland",
+          "Latvia",
+          "United Kingdom",
+          "Luxembourg",
+          "Republic of Malta",
+          "Nederland",
+          "Portugal",
+          "Slovakia",
+          "Slovenia"
+        ];
 
-      this.data.maps[0].splice(omIndex, 1, {
-        name: Europe[0],
-        value: this.data.maps[0][omIndex].value
-      });
-      for (let i = 1; i < Europe.length; i++) {
-        this.data.maps[0].splice(omIndex, 0, {
-          name: Europe[i],
+        this.data.maps[0].splice(omIndex, 1, {
+          name: Europe[0],
           value: this.data.maps[0][omIndex].value
         });
-      }
-      this.data.maps[1].splice(omIndex, 1, {
-        name: Europe[0],
-        value: this.data.maps[1][omIndex].value
-      });
-      for (let i = 1; i < Europe.length; i++) {
-        this.data.maps[1].splice(omIndex, 0, {
-          name: Europe[i],
+        for (let i = 1; i < Europe.length; i++) {
+          this.data.maps[0].splice(omIndex, 0, {
+            name: Europe[i],
+            value: this.data.maps[0][omIndex].value
+          });
+        }
+        this.data.maps[1].splice(omIndex, 1, {
+          name: Europe[0],
           value: this.data.maps[1][omIndex].value
         });
+        for (let i = 1; i < Europe.length; i++) {
+          this.data.maps[1].splice(omIndex, 0, {
+            name: Europe[i],
+            value: this.data.maps[1][omIndex].value
+          });
+        }
       }
     },
     changeProfile() {
@@ -280,4 +312,10 @@ export default {
 };
 </script>
 <style scoped>
+.noDataInfo {
+  width: 100%;
+  height: 100%;
+  color: #2ccbef;
+  padding: 0% 32% 0 41%;
+}
 </style>

@@ -5,7 +5,7 @@ const http = axios.create({
   baseURL: 'http://localhost:8080/',
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    'Content-Type': 'application/json;charset=utf-8',
   },
   transformRequest: [function (data) {
     let newData = '';

@@ -264,7 +264,7 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
     z-index: 9999999999;
 
     p {
-        font-size: 1rem;
+        font-size: 0.86rem;
         padding: 0.2rem 0 1rem 2%;
         ;
         color: map-get($map: $colors, $key:'info');
