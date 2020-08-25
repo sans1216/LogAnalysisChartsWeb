@@ -1,27 +1,23 @@
 <template>
-  <div style="margin: -.476rem;height:100%" ref="vicBig">
-    <div class="Echarts" style="height:100%;">
-      <div class="victimLBox">
-        <div class="panel">
-          <h3 class="chart-title">受害者分布图</h3>
-          <loadingSign v-if="isLoading" style="top: 40%;left: 28%;"></loadingSign>
-          <div id="victimmap-big" style="height:90%;width:100%;padding:0 5rem 1rem;"></div>
-          <div class="panel-footer"></div>
-        </div>
+  <div class="victimContainer" ref="vicBig">
+    <div class="victimTop">
+      <div class="panel" style="width:55%;margin:0 0 0 1rem">
+        <h3 class="chart-title">受害者分布图</h3>
+        <loadingSign v-if="isLoading" style="top: 40%;left: 28%;"></loadingSign>
+        <div id="victimmap-big" style="height:90%;width:100%;padding:0 5rem 1rem;"></div>
+        <div class="panel-footer"></div>
       </div>
-      <div class="victimRBox">
-        <div class="panel">
-          <h3 class="chart-title">受害者TOP5</h3>
-          <loadingSign v-if="isLoading" style="top: 40%;left: 75%;"></loadingSign>
-          <div id="victim-top" class="victimTop-item"></div>
-          <div class="panel-footer"></div>
-        </div>
+      <div class="panel" style="width:40%;margin:0 0 0 2rem">
+        <h3 class="chart-title">受害者TOP5</h3>
+        <loadingSign v-if="isLoading" style="top: 40%;left: 75%;"></loadingSign>
+        <div id="victim-top" class="victimTop-item"></div>
+        <div class="panel-footer"></div>
       </div>
-      <div class="victim-form">
-        <h3 class="chart-title">最新受害者列表</h3>
-        <loadingSign v-if="isLoading" style="top:77%;left: 44%;"></loadingSign>
-        <chart-form :config="chartConfig" style="height:90%;padding:0 2rem 3rem" id="vicChart"></chart-form>
-      </div>
+    </div>
+    <div class="victimBottom">
+      <h3 class="chart-title" style="padding: 0.5rem 1.3rem">最新受害者列表</h3>
+      <loadingSign v-if="isLoading" style="top:77%;left: 44%;"></loadingSign>
+      <chart-form :config="chartConfig" id="vicChart"></chart-form>
     </div>
   </div>
 </template>
@@ -43,11 +39,12 @@ export default {
     };
   },
   mounted() {
+    //初始化两张表格
     const myChart = this.$echarts.init(
       document.getElementById("victimmap-big")
     );
     const myChart1 = this.$echarts.init(document.getElementById("victim-top"));
-
+    //当屏幕变化时监听，自动触发resize事件
     window.addEventListener("resize", () => {
       myChart.resize();
       myChart1.resize();
@@ -56,19 +53,32 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      let params = {
-        startTime: this.$parent.time.startTime,
-        endTime: this.$parent.time.endTime
-      };
-      if (this.$parent.time.startTime === undefined) {
+      //当请求发送时，启动loading动画
+      this.isLoading = true;
+      //处理时间范围
+      if (this.$parent.time[0] === "")
+        var params = {
+          startTime: null,
+          endTime: null
+        };
+      else if (this.$parent.timeData.startTime === undefined)
         params = {
           startTime: null,
           endTime: null
         };
+      else {
+        params = {
+          startTime: this.$parent.timeData.startTime,
+          endTime: this.$parent.timeData.endTime
+        };
       }
+      //发送请求
       await this.$http.post("/Victim/analysis", params).then(res => {
+        //获取数据
         this.data = res.data.data;
+        //关闭loading动画
         this.isLoading = false;
+        //数据格式
         const myseries = [
           {
             name: "受害热度",
@@ -80,7 +90,7 @@ export default {
             data: this.data.maps[0]
           },
           {
-            name: "受害告警类型",
+            name: "主要受害告警类型",
             type: "map",
             mapType: "world",
             label: {
@@ -96,7 +106,10 @@ export default {
         const victimOptions = {
           title: {
             subtext: "不同地域所遭受的攻击详情",
-            left: 295
+            left: 15,
+            subtextStyle: {
+              color: "#2db7f5"
+            }
           },
           tooltip: {
             trigger: "item",
@@ -115,26 +128,16 @@ export default {
               return res;
             }
           },
-          toolbox: {
-            show: true,
-            orient: "vertical",
-            left: "right",
-            top: "center",
-            feature: {
-              restore: {},
-              saveAsImage: {}
-            }
-          },
           visualMap: {
             min: 0,
             max: 1100000,
             realtime: false,
             calculable: true,
             inRange: {
-              color: ["#FFF", "#8B78F6"]
+              color: ["#15cbec", "#3D85FF"]
             },
-            left: 20,
-            bottom: 50
+            left: -10,
+            bottom: 10
           },
           series: myseries
         };
@@ -233,26 +236,27 @@ export default {
           "Slovakia",
           "Slovenia"
         ];
-
-        this.data.maps[0].splice(omIndex, 1, {
-          name: Europe[0],
-          value: this.data.maps[0][omIndex].value
-        });
-        for (let i = 1; i < Europe.length; i++) {
-          this.data.maps[0].splice(omIndex, 0, {
-            name: Europe[i],
+        if (omIndex != -1) {
+          this.data.maps[0].splice(omIndex, 1, {
+            name: Europe[0],
             value: this.data.maps[0][omIndex].value
           });
-        }
-        this.data.maps[1].splice(omIndex, 1, {
-          name: Europe[0],
-          value: this.data.maps[1][omIndex].value
-        });
-        for (let i = 1; i < Europe.length; i++) {
-          this.data.maps[1].splice(omIndex, 0, {
-            name: Europe[i],
+          for (let i = 1; i < Europe.length; i++) {
+            this.data.maps[0].splice(omIndex, 0, {
+              name: Europe[i],
+              value: this.data.maps[0][omIndex].value
+            });
+          }
+          this.data.maps[1].splice(omIndex, 1, {
+            name: Europe[0],
             value: this.data.maps[1][omIndex].value
           });
+          for (let i = 1; i < Europe.length; i++) {
+            this.data.maps[1].splice(omIndex, 0, {
+              name: Europe[i],
+              value: this.data.maps[1][omIndex].value
+            });
+          }
         }
       }
     }
@@ -263,31 +267,31 @@ export default {
 .victimmap-big {
   width: 100%;
 }
-.victimLBox {
-  margin: 0.6rem 0 0.3rem 4.6rem;
-  border-radius: 1.076923rem;
-  width: 56%;
-  height: 48%;
+.victimTop {
+  display: flex;
+  width: 100%;
+  height: 60%;
+  margin: 0.5rem 0 -0.5rem 0;
 }
-.victimRBox {
-  margin: 0.5rem 3.5rem 0.3rem 3.5rem;
+.victimBottom {
+  margin: 0rem 3.5rem 0.3rem 2.5%;
   border-radius: 1.07rem;
-  width: 33%;
-  position: relative;
-  top: -49%;
-  left: 58%;
-  height: 48%;
-}
-.victim-form {
-  position: relative;
-  left: 10%;
-  height: 23%;
-  top: -50%;
-  width: 80%;
+  width: 100%;
+  height: 32%;
 }
 .victimTop-item {
   width: 100%;
   height: 90%;
   padding: 0 3rem 3rem;
+}
+.victimContainer {
+  margin: -0.5rem;
+  height: 100%;
+}
+#vicChart {
+  height: 86%;
+  position: relative;
+  padding: 0 4rem 3rem 0;
+  z-index: 10;
 }
 </style>

@@ -41,6 +41,7 @@ export default {};
   margin-top: -10px;
   margin-left: -10px;
 }
+ /* 动画 */
 @-webkit-keyframes load {
   0% {
     -webkit-transform: rotate(0deg);

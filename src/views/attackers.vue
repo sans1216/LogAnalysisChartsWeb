@@ -1,27 +1,23 @@
 <template>
-  <div style="margin: -.476rem;height:100%">
-    <div class="Echarts" ref="attBig" style="height:100%;">
-      <div class="attackLBox">
-        <div class="panel">
-          <h3 class="chart-title">攻击者分布图</h3>
-          <loadingSign v-if="isLoading" style="top: 40%;left: 28%;"></loadingSign>
-          <div id="attackmap-big" style="height:90%;padding:0 5rem 1rem;"></div>
-          <div class="panel-footer"></div>
-        </div>
+  <div class="attackContainer" ref="attBig">
+    <div class="attackTop">
+      <div class="panel" style="width:55%;margin:0 0 0 1rem">
+        <h3 class="chart-title">攻击者分布图</h3>
+        <loadingSign v-if="isLoading" style="top: 40%;left: 28%;"></loadingSign>
+        <div id="attackmap-big" style="height:90%;width:100%;padding:0 5rem 1rem;"></div>
+        <div class="panel-footer"></div>
       </div>
-      <div class="attackRBox">
-        <div class="panel">
-          <h3 class="chart-title">攻击者TOP5</h3>
-          <loadingSign v-if="isLoading" style="top: 40%;left: 75%;"></loadingSign>
-          <div id="attack-top" class="attackTop-item"></div>
-          <div class="panel-footer"></div>
-        </div>
+      <div class="panel" style="width:40%;margin:0 0 0 2rem">
+        <h3 class="chart-title">攻击者TOP5</h3>
+        <loadingSign v-if="isLoading" style="top: 40%;left: 75%;"></loadingSign>
+        <div id="attack-top" class="attackTop-item"></div>
+        <div class="panel-footer"></div>
       </div>
-      <div class="attack-form">
-        <h3 class="chart-title">最新攻击者列表</h3>
-        <loadingSign v-if="isLoading" style="top:77%;left: 44%;"></loadingSign>
-        <chart-form :config="chartConfig" style="height:90%;padding:0 2rem 3rem" id="vicChart"></chart-form>
-      </div>
+    </div>
+    <div class="attackBottom">
+      <h3 class="chart-title" style="padding: 0.5rem 1.3rem">最新攻击者列表</h3>
+      <loadingSign v-if="isLoading" style="top:77%;left: 44%;"></loadingSign>
+      <chart-form :config="chartConfig" id="vicChart"></chart-form>
     </div>
   </div>
 </template>
@@ -55,21 +51,34 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      let params = {
-        startTime: this.$parent.time.startTime,
-        endTime: this.$parent.time.endTime
-      };
-      if (this.$parent.time.startTime === undefined) {
+      //开启loading
+      this.isLoading = true;
+      //处理时间范围
+      if (this.$parent.time[0] === "")
+        var params = {
+          startTime: null,
+          endTime: null
+        };
+      else if (this.$parent.timeData.startTime === undefined)
         params = {
           startTime: null,
           endTime: null
         };
+      else {
+        params = {
+          startTime: this.$parent.timeData.startTime,
+          endTime: this.$parent.timeData.endTime
+        };
       }
+      //发起请求
       await this.$http.post("/Attacker/analysis", params).then(res => {
         if (res.data.code === 200) {
+          //状态码200,关闭loading动效
           this.isLoading = false;
           this.data = res.data.data;
+          //处理数据
           this.processData();
+          //处理数据
           const myseries = [
             {
               name: "攻击热度",
@@ -81,7 +90,7 @@ export default {
               data: this.data.maps[0]
             },
             {
-              name: "攻击链类型",
+              name: "主要攻击链类型",
               type: "map",
               mapType: "world",
               label: {
@@ -90,13 +99,18 @@ export default {
               data: this.data.maps[1]
             }
           ];
+          //初始化图表
           const mapChart = this.$echarts.init(
             document.getElementById("attackmap-big")
           );
+          //配置图表项
           const attackerOptions = {
             title: {
-              subtext: "不同地域所发起的攻击详情",
-              left: 295
+              subtext: "不同地域发起的攻击详情",
+              left: 15,
+              subtextStyle: {
+                color: "#2db7f5"
+              }
             },
             tooltip: {
               trigger: "item",
@@ -115,32 +129,22 @@ export default {
                 return res;
               }
             },
-            toolbox: {
-              show: true,
-              orient: "vertical",
-              left: "right",
-              top: "center",
-              feature: {
-                restore: {},
-                saveAsImage: {}
-              }
-            },
+
             visualMap: {
               min: 0,
               max: 1100000,
               realtime: false,
               calculable: true,
               inRange: {
-                color: ["#FFF", "#8B78F6"]
+                color: ["#15cbec", "#3D85FF"]
               },
-              left: 20,
-              bottom: 50
+              left: -10,
+              bottom: 10
             },
             series: myseries
           };
           mapChart.setOption(attackerOptions);
           this.chartConfig = this.data.latestAttacker;
-          this.chartConfig.rowNum = 3;
           this.chartConfig.data = this.chartConfig.data.concat(
             this.chartConfig.data.slice(0, 5)
           );
@@ -192,7 +196,7 @@ export default {
             ],
             series: [
               {
-                name: "受害次数",
+                name: "发起攻击次数",
                 type: "bar",
                 barWidth: "60%",
                 label: {
@@ -234,61 +238,62 @@ export default {
           "Slovakia",
           "Slovenia"
         ];
-
-        this.data.maps[0].splice(omIndex, 1, {
-          name: Europe[0],
-          value: this.data.maps[0][omIndex].value
-        });
-        for (let i = 1; i < Europe.length; i++) {
-          this.data.maps[0].splice(omIndex, 0, {
-            name: Europe[i],
+        if (omIndex != -1) {
+          this.data.maps[0].splice(omIndex, 1, {
+            name: Europe[0],
             value: this.data.maps[0][omIndex].value
           });
-        }
-        this.data.maps[1].splice(omIndex, 1, {
-          name: Europe[0],
-          value: this.data.maps[1][omIndex].value
-        });
-        for (let i = 1; i < Europe.length; i++) {
-          this.data.maps[1].splice(omIndex, 0, {
-            name: Europe[i],
+          for (let i = 1; i < Europe.length; i++) {
+            this.data.maps[0].splice(omIndex, 0, {
+              name: Europe[i],
+              value: this.data.maps[0][omIndex].value
+            });
+          }
+          this.data.maps[1].splice(omIndex, 1, {
+            name: Europe[0],
             value: this.data.maps[1][omIndex].value
           });
+          for (let i = 1; i < Europe.length; i++) {
+            this.data.maps[1].splice(omIndex, 0, {
+              name: Europe[i],
+              value: this.data.maps[1][omIndex].value
+            });
+          }
         }
       }
     }
   }
 };
 </script>
-<style lang="scss" scoped>
+<style scoped>
 .attackmap-big {
   width: 100%;
 }
-.attackLBox {
-  margin: 0.6rem 0 0.3rem 4.6rem;
-  border-radius: 1.076923rem;
-  width: 56%;
-  height: 48%;
+.attackTop {
+  display: flex;
+  width: 100%;
+  height: 60%;
+  margin: 0.5rem 0 -0.5rem 0;
 }
-.attackRBox {
-  margin: 0.5rem 3.5rem 0.3rem 3.5rem;
+.attackBottom {
+  margin: 0rem 3.5rem 0.3rem 2.5%;
   border-radius: 1.07rem;
-  width: 33%;
-  position: relative;
-  top: -49%;
-  left: 58%;
-  height: 48%;
-}
-.attack-form {
-  position: relative;
-  left: 10%;
-  height: 23%;
-  top: -50%;
-  width: 80%;
+  width: 100%;
+  height: 32%;
 }
 .attackTop-item {
   width: 100%;
   height: 90%;
   padding: 0 3rem 3rem;
+}
+.attackContainer {
+  margin: -0.5rem;
+  height: 100%;
+}
+#vicChart {
+  height: 86%;
+  position: relative;
+  padding: 0 4rem 3rem 0;
+  z-index: 10;
 }
 </style>

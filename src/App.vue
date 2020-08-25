@@ -1,7 +1,7 @@
 <template>
   <div ref="bg" class="test" :class="{'noImage': !data_IsImage}">
     <pointwave :color="0x097bdb" style="height:0" />
-    <div class="container" style="height:100%">
+    <div class="container">
       <div class="menu-l">
         <Button type="info" ghost @click="$router.push('/')" style="margin-left:1.4rem">总体预览</Button>
         <Button
@@ -42,47 +42,45 @@
           style="margin-left:1.4rem"
         >TOPN</Button>
       </div>
-      <div class="pheader">
-        <img class="logo" src="./assets/images/logo.svg" alt />
-        <p class="title">分析报告可视化面板展示</p>
-      </div>
-      <div class="tools" ref="tools">
-        <DatePicker
-          type="datetimerange"
-          :disabled-seconds="seconds"
-          ref="time"
-          format="yyyy-MM-dd HH:mm:ss"
-          @on-change="time=$event"
-          v-model="time"
-          placeholder="选择时间"
-          style="width: 8rem"
-        ></DatePicker>
-        <Button type="info" ghost @click="reDraw" style="margin:1.2rem" v-if="!isFullScreen">生成报表</Button>
-        <Button
-          type="info"
-          ghost
-          href="http://10.11.40.91:8080/report/download"
-          @click="exportFile"
-          style="margin-left:0.1rem"
-          v-if="!isFullScreen"
-        >导出</Button>
-        <Button
-          type="info"
-          ghost
-          v-if="!isFullScreen"
-          @click="getFullScreen"
-          style="margin-left:1.2rem"
-        >全屏显示</Button>
-        <Button
-          type="info"
-          ghost
-          size="large"
-          v-if="isFullScreen"
-          @click="leaveFullScreen"
-          style="margin-left:1.4rem"
-        >退出全屏</Button>
-      </div>
-      <div style="height:100%">
+      <div class="pheader">分析报告可视化面板展示</div>
+      <div class="body">
+        <div class="tools" ref="tools">
+          <DatePicker
+            type="datetimerange"
+            :disabled-seconds="seconds"
+            ref="time"
+            format="yyyy-MM-dd HH:mm:ss"
+            @on-change="time=$event"
+            v-model="time"
+            placeholder="选择时间"
+            style="width: 8rem"
+          ></DatePicker>
+          <Button type="info" ghost @click="reDraw" style="margin:.7rem" v-if="!isFullScreen">生成报表</Button>
+          <Button
+            type="info"
+            ghost
+            href="http://10.11.40.91:8080/report/download"
+            @click="exportFile"
+            style="margin-left:0.1rem"
+            v-if="!isFullScreen"
+          >导出</Button>
+          <loadingSign v-if="isLoading" style="width: 3rem;height: 3rem; top: 3%;left: 89%;"></loadingSign>
+          <Button
+            type="info"
+            ghost
+            v-if="!isFullScreen"
+            @click="getFullScreen"
+            style="margin-left:.8rem"
+          >全屏显示</Button>
+          <Button
+            type="info"
+            ghost
+            size="large"
+            v-if="isFullScreen"
+            @click="leaveFullScreen"
+            style="margin-left:1.4rem"
+          >退出全屏</Button>
+        </div>
         <router-view ref="content" :key="$route.path"></router-view>
       </div>
     </div>
@@ -164,63 +162,79 @@ export default {
         59,
         60
       ],
+      isLoading: false,
       timeData: null,
       data_IsImage: true,
-      isFullScreen: false
+      isFullScreen: false,
+      timeData: null
     };
+  },
+  created() {
+     document.title = '日志分析生成报告项目'
   },
   methods: {
     changeTime() {},
     reDraw() {
       let path = this.$route.path;
-      this.time = { startTime: this.time[0], endTime: this.time[1] };
-      console.log(this.time);
-      const time2 = JSON.stringify(this.time);
-      console.log(time2);
+      if (this.time[0] != "" || this.time != null) {
+        const [startTime, endTime] = this.time;
+        this.timeData = { startTime, endTime };
+      } else {
+        this.timeData = { startTime: null, endTime: null };
+      }
       if (path === "/") {
-        this.$refs.content.$refs.asset.initEchart(time2);
-        this.$refs.content.$refs.map.initAttEchart(time2);
-        this.$refs.content.$refs.map.initVicEchart(time2);
-        this.$refs.content.$refs.topn.initEchart(time2);
-        this.$refs.content.$refs.time.initEchart(time2);
+        this.$refs.content.$refs.asset.initEchart();
+        this.$refs.content.$refs.map.initAttEchart();
+        this.$refs.content.$refs.map.initVicEchart();
+        this.$refs.content.$refs.topn.initEchart();
+        this.$refs.content.$refs.time.initEchart();
+        this.$refs.content.$refs.suggest.initSuggest();
       } else if (path === "/victims") {
-        this.$refs.content.$refs.vicBig.__vue__.initEchart(time2);
+        this.$refs.content.$refs.vicBig.__vue__.initEchart();
       } else if (path === "/attackers") {
-        this.$refs.content.$refs.attBig.__vue__.initEchart(time2);
+        this.$refs.content.$refs.attBig.__vue__.initEchart();
       } else if (path === "/topn") {
-        this.$refs.content.$refs.topnBig.__vue__.initEchart(time2);
+        this.$refs.content.$refs.topnBig.__vue__.initEchart();
       } else if (path === "/assets") {
-        this.$refs.content.$refs.assetBig.__vue__.initEchart(time2);
+        this.$refs.content.$refs.assetBig.__vue__.initEchart();
       } else if (path === "/timetrend") {
-        this.$refs.content.$refs.timeBig.__vue__.initEchart(time2);
+        this.$refs.content.$refs.timeBig.__vue__.initEchart();
       }
     },
     async exportFile() {
       // window.location.href = "http://47.115.43.39:8080/report/download/";
-      let params = {
-        startTime: this.time[0],
-        endTime: this.time[1]
-      };
-      if (this.time[0] === "") {
+      this.isLoading = true;
+      if (this.time[0] === "")
+        var params = {
+          startTime: null,
+          endTime: null
+        };
+      else if (this.timeData.startTime === undefined)
         params = {
           startTime: null,
           endTime: null
         };
+      else {
+        params = {
+          startTime: this.timeData.startTime,
+          endTime: this.timeData.endTime
+        };
       }
       await this.$http
-        .post("/report/download", params, { responseType: "blob" })
+        .post("/report/download", null, { responseType: "blob" })
         .then(res => {
           var blob = new Blob([res.data]);
           var downloadElement = document.createElement("a");
           var href = window.URL.createObjectURL(blob); //创建下载的链接
           downloadElement.href = href;
-          downloadElement.download = "用户数据.docx"; //下载后文件名
+          downloadElement.download = "用户数据分析报告.docx"; //下载后文件名
+
+          this.isLoading = false;
           document.body.appendChild(downloadElement);
           downloadElement.click(); //点击下载
           document.body.removeChild(downloadElement); //下载完成移除元素
           window.URL.revokeObjectURL(href); //释放掉blob对象
         });
-
     },
 
     getFullScreen() {
@@ -232,8 +246,7 @@ export default {
       this.outFullCreeen(document);
     },
     FullCreeen(element) {
-      this.$refs.tools.style.margin = "1.8% 41%";
-      this.$refs.tools.style.height = "2rem";
+      this.$refs.tools.style.margin = "2% 0";
       let el = element;
       let rfs =
         el.requestFullScreen ||
@@ -251,8 +264,7 @@ export default {
     },
     //退出全屏的方法
     outFullCreeen(element) {
-      this.$refs.tools.style.margin = " 0 36% 0.7% 36%";
-      this.$refs.tools.style.height = "3.7rem";
+      this.$refs.tools.style.margin = "0";
       let el = element;
       let cfs =
         el.cancelFullScreen ||
@@ -281,7 +293,9 @@ export default {
 }
 .container {
   height: 100%;
-  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .noImage {
   background-image: none;
@@ -293,24 +307,30 @@ export default {
   position: relative;
   left: 42%;
 }
-.title {
-  position: relative;
-  top: -1.9rem;
-  left: 21%;
-}
 .tools {
-  margin: 0 36% 0.7% 36%;
-  height: 3.7rem;
+  width: 100%;
+  text-align: center;
+  position: relative;
 }
 
 .menu-l {
   position: fixed;
   left: 6%;
   top: 12%;
+  z-index: 9999;
 }
 .menu-r {
   position: fixed;
   right: 6%;
   top: 12%;
+  z-index: 9999;
+}
+.body {
+  flex: 1;
+  height: 0;
+  width: 100%;
+  padding: 0 3.5rem 2.7rem 3.5rem;
+  display: flex;
+  flex-direction: column;
 }
 </style>

@@ -33,13 +33,14 @@ body {
 }
 
 .pheader {
-    height:5.6rem;
+    height: 5.6rem;
     border-radius: .307692rem;
     color: map-get($colors, 'light');
-    width: 36%;
-    margin: auto;
-    padding: 1.7rem 0 0;
-    font-size: 1.9rem;
+    width: 100%;
+    font-size: 2.4rem;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    line-height: 5.6rem;
+    text-align: center;
     animation: color 3s ease 1s infinite forwards
 }
 
@@ -124,7 +125,9 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
     border-left: 1px solid #e8eaec;
     position: relative;
 }
-
+.ivu-time-picker-cells-cell{
+    color:#4676e0;
+}
 #app>div>div.ivu-layout-sider>div.ivu-layout-sider-children>ul>a:visited {
     background: #06276e;
 }
@@ -151,7 +154,7 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
     background-image: url(./images/bg1.png);
     background-size: 100% 100%;
     height: 100%;
-    margin: 0px;
+    width: 100%;
 }
 
 @keyframes color {
@@ -189,48 +192,35 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
 
 .leftBox {
     height: 98%;
-    border-radius: 1.076923rem;
+    border-radius: 1.07rem;
 }
 
 .mainBox {
     width: 100%;
     height: 100%;
-    border-radius: 1.076923rem;
+    border-radius: 1.07rem;
 }
 
 .rightBox {
     width: 100%;
     height: 100%;
-    border-radius: 1.076923rem;
-}
-
-.vicChart {
-    padding: .769231rem 0;
-    width: 94%;
-    position: relative;
-    top: -13%;
-    left: 3%;
-    height: 16%;
+    border-radius: 1.07rem;
 }
 
 .btnSuggest {
-    position: relative;
-    width: 28%;
-    height: 7%;
-    border-radius: 1.076923rem;
-    top: -145%;
-    left: 74%;
-
+    width:100%;
+    height: 10%;
+    border-radius: 1.07rem;
     &.h3 {
         padding-left: 32%;
     }
 }
 
 .timeBox {
-    width: 82%;
-    margin: 1% 9%;
-    height: 72%;
-    border-radius: 1.076923rem;
+    width: 92%;
+    margin:0 4.3%;
+    height:97%;
+    border-radius: 1.07rem;
 }
 
 .changeBtn {
@@ -243,11 +233,6 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
 
 .changeBtn:hover {
     color: rgb(27, 106, 252);
-}
-
-.assetBox {
-    border-radius: 1.076923rem;
-    height: 96%;
 }
 
 .sgBox {
@@ -264,9 +249,8 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
     z-index: 9999999999;
 
     p {
-        font-size: 0.86rem;
+        font-size: 10px;
         padding: 0.2rem 0 1rem 2%;
-        ;
         color: map-get($map: $colors, $key:'info');
     }
 
@@ -372,7 +356,7 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
     border-radius: 3px;
     text-align: center;
     transition: all .2s ease-in-out;
-    color: #9fd4edbf;
+    color: #8ed4f5f7;;
 }
 
 .ivu-btn-primary {
@@ -387,8 +371,9 @@ ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu),
     font-size: 14px;
     border-radius: 3px;
     color: #113782;
-    span{
-        color:#1f86b4;
+
+    span {
+        color: #39aee4;
     }
 }
 
@@ -435,6 +420,7 @@ fieldset[disabled] .ivu-btn-text:hover {
     background: #001b2c;
     border: 1px solid #2DB7F5;
 }
+
 .ivu-date-picker-cells-cell-range:before {
     content: "";
     display: block;
@@ -447,16 +433,21 @@ fieldset[disabled] .ivu-btn-text:hover {
     left: 0;
     right: 0;
 }
-.ivu-time-picker-cells-cell-selected, .ivu-time-picker-cells-cell-selected:hover {
+
+.ivu-time-picker-cells-cell-selected,
+.ivu-time-picker-cells-cell-selected:hover {
     color: #95c9ff;
     background: #124c76d1;
 }
-body > div.test > div.container > div.tools > div.ivu-color-picker > div.ivu-select-dropdown.ivu-transfer-no-max-height > div > div.ivu-color-picker-confirm > button.ivu-btn.ivu-btn-primary.ivu-btn-small > span{
+
+body>div.test>div.container>div.tools>div.ivu-color-picker>div.ivu-select-dropdown.ivu-transfer-no-max-height>div>div.ivu-color-picker-confirm>button.ivu-btn.ivu-btn-primary.ivu-btn-small>span {
     color: white;
 }
+
 .ivu-picker-panel-content .ivu-picker-panel-content .ivu-time-picker-cells-with-seconds .ivu-time-picker-cells-list {
     width: 108px;
 }
+
 .ivu-time-picker-header {
     height: 32px;
     line-height: 32px;

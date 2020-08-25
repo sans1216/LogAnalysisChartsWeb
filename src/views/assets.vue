@@ -1,36 +1,29 @@
 <template>
-  <div style="padding:0  1.4rem;height:100%" ref="assetBig">
-    <div style="display:flex;width:100%;height:35%">
-      <div class="assetBox" style="margin:0 5rem;width: 94%;">
+  <div class="assetContainer" ref="assetBig">
+    <div class="assetTContainer">
+      <div class="assetItem">
         <div class="panel">
-          <h3 class="chart-title" style="padding-top:1.5rem">风险资产数量分布</h3>
-          <loadingSign v-if="isLoading" style="top: 35%;left: 22%;"></loadingSign>
-          <div id="assChart1" style="width: 21rem;height:70%;margin:auto"></div>
+          <h3 class="chart-title" style="padding-top:1.5rem">风险资产分布图</h3>
+          <loadingSign v-if="isLoading" style="top: 28%;left: 25%;"></loadingSign>
+          <div id="assChart1"></div>
           <div class="panel-footer"></div>
         </div>
       </div>
-      <div class="assetBox" style="margin:0 5rem 0 0;width: 94%;">
+      <div class="assetItem">
         <div class="panel">
-          <h3 class="chart-title" style="padding-top:1.5rem">被攻击资产TOP5</h3>
-          <loadingSign v-if="isLoading" style="top: 35%;left: 72%;"></loadingSign>
-          <div id="assTop5" style="width: 26rem;height:70%;margin:auto"></div>
+          <h3 class="chart-title" style="padding-top:1.5rem">风险资产TOP5</h3>
+          <loadingSign v-if="isLoading" style="top: 28%;left: 69%;"></loadingSign>
+          <div id="assTop5"></div>
           <div class="panel-footer"></div>
         </div>
       </div>
     </div>
-    <div style="height:34%">
-      <div class="assetBox" style="height: 100%;margin: 0.5rem 1rem 0px 2.9rem;width: 94%;">
-        <div class="panel">
-          <loadingSign v-if="isLoading" style="top: 71%;left: 45%;"></loadingSign>
-          <h3 class="chart-title" style="padding-top:1rem">最近十项被攻击风险资产</h3>
-          <!-- <dv-scroll-board
-            style="height:73%;padding:0 3rem 3rem"
-            :config="assetConfig"
-            id="assChart2"
-          />-->
-          <chart-form style="height:87%;padding:0 3rem 3rem" id="assChart2" :config="assetConfig"></chart-form>
-          <div class="panel-footer"></div>
-        </div>
+    <div class="assetBContainer">
+      <div class="panel">
+        <loadingSign v-if="isLoading" style="top: 70%;left: 45%;"></loadingSign>
+        <h3 class="chart-title" style="padding-top:1rem">最新十项风险资产</h3>
+        <chart-form style="height:90%;padding:0 3rem 3rem" id="assChart2" :config="assetConfig"></chart-form>
+        <div class="panel-footer"></div>
       </div>
     </div>
   </div>
@@ -57,25 +50,38 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      let params = {
-        startTime: this.$parent.time.startTime,
-        endTime: this.$parent.time.endTime
-      };
-      if (this.$parent.time.startTime === undefined) {
+      //开启loading动效
+      this.isLoading = true;
+      //处理时间范围
+      if (this.$parent.time[0] === "")
+        var params = {
+          startTime: null,
+          endTime: null
+        };
+      else if (this.$parent.timeData.startTime === undefined)
         params = {
           startTime: null,
           endTime: null
         };
+      else {
+        params = {
+          startTime: this.$parent.timeData.startTime,
+          endTime: this.$parent.timeData.endTime
+        };
       }
+      //发起请求
       await this.$http.post("/RiskAsset/all", params).then(res => {
+        //初始化图表
         const numsChart = this.$echarts.init(
           document.getElementById("assChart1")
         );
         const topChart = this.$echarts.init(document.getElementById("assTop5"));
+        //loading关闭
         this.isLoading = false;
         this.assData = res.data.data;
+        //获取里面的字段
         const titlename = this.assData.riskAssetVo3.titleName;
-        const { data } = this.assData.riskAssetVo3;
+        const data = this.assData.riskAssetVo3.data;
         const valdata = this.assData.riskAssetVo3.valData;
         const myColor = [
           "#2EE7FF",
@@ -84,10 +90,11 @@ export default {
           "#8B78F6",
           "#0f225E"
         ];
+        //配置图表项,具体查询echarts
         const topOption = {
           // 图标位置
           grid: {
-            top: "10%",
+            top: "0%",
             left: "35%",
             right: "20%",
             bottom: "10%"
@@ -178,6 +185,7 @@ export default {
             }
           ]
         };
+        //配置图表项,具体查询echarts
         const numsOption = {
           color: ["#2EE7FF", "#86FED8", "#0f225E", "#8ac2f8c4"],
           tooltip: {
@@ -186,8 +194,8 @@ export default {
           },
           legend: {
             orient: "vertical",
-            left: 0,
-            top: 40,
+            left: 80,
+            top: 10,
             data: ["低风险", "已失陷", "高风险"],
             textStyle: {
               color: "white"
@@ -197,9 +205,9 @@ export default {
             {
               name: "资产分布",
               type: "pie",
-              radius: ["50%", "60%"],
-              top: -30,
-              left: 0,
+              radius: ["60%", "80%"],
+              top: 0,
+              left: 10,
               avoidLabelOverlap: false,
               label: {
                 show: false,
@@ -231,3 +239,33 @@ export default {
   }
 };
 </script>
+<style scoped>
+.assetContainer {
+  padding: 0 1.4rem;
+  height: 100%;
+  display: flex;
+  border-radius: 1.076923rem;
+  flex-direction: column;
+}
+.assetTContainer {
+  display: flex;
+  width: 100%;
+  height: 40%;
+}
+.assetBContainer {
+  height: 50%;
+  margin: 1rem 0 0 0;
+}
+.assetItem {
+  margin: 0 2rem 0 3rem;
+  width: 100%;
+}
+#assChart1 {
+  width: 100%;
+  height: 74%;
+}
+#assTop5 {
+  width: 100%;
+  height: 74%;
+}
+</style>

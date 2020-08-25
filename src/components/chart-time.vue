@@ -1,14 +1,10 @@
 <template>
-  <div class="Echarts">
     <div class="leftBox">
       <div class="panel">
         <h3 class="chart-title">{{msg}}</h3>
         <loadingSign v-if="isLoading" style="top: 33%;left: 13%;"></loadingSign>
-        <div id="chart1" style="width: 100%;height:16rem;"></div>
-        <!-- <div v-if="!haveData" class="noDataInfo">未获取到数据</div> -->
+        <div id="chart1" style="width: 100%;height:100%;"></div>
       </div>
-      <div class="panel-footer"></div>
-    </div>
   </div>
 </template>
 
@@ -49,27 +45,45 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      let params = {
-        startTime: this.$parent.$parent.time.startTime,
-        endTime: this.$parent.$parent.time.endTime
-      };
-      if (this.$parent.$parent.time.startTime === undefined) {
+      //开启loading
+      this.isLoading = true;
+      //设置时间
+       if (this.$parent.$parent.time[0] === "")
+        var params = {
+          startTime: null,
+          endTime: null
+        };
+      else if (this.$parent.$parent.timeData.startTime === undefined)
         params = {
           startTime: null,
           endTime: null
         };
+      else {
+        params = {
+          startTime: this.$parent.$parent.timeData.startTime,
+          endTime: this.$parent.$parent.timeData.endTime
+        };
       }
+      //发起请求
       await this.$http.post("/DistributionTrend/all", params).then(res => {
         if (res.data.code == 200) {
+          //状态码200,关闭请求
           this.isLoading = false;
           this.data = res.data.data;
           this.timeData = res.data.data.list;
+          //截取时间到分钟部分,秒钟不显示
+          for (let i = 0; i < this.timeData.length; i++) {
+            this.timeData[i] = this.timeData[i].substr(0, 16);
+          }
+          //如果返回数据长度为0,那么当作没有没有数据
           if (res.data.data.high.length == 0) {
             this.haveData = false;
           }
-          console.log(this.haveData)
+          //初始化表格
           const myChart = this.$echarts.init(document.getElementById("chart1"));
-          const timeData = this.timeData.map(str => str.replace("2020/", ""));
+          //时间处理
+          const timeData = this.timeData.map(str => str.replace("2020-", ""));
+          //配置图表项,具体请查询echarts官网
           const option = {
             color: this.colors,
             tooltip: {
@@ -92,14 +106,11 @@ export default {
             grid: {
               left: "8%",
               right: "8%",
-              bottom: "30%",
+              top:"11%",
+              bottom: "20%",
               containLabel: true
             },
-            toolbox: {
-              feature: {
-                saveAsImage: {}
-              }
-            },
+
             xAxis: [
               {
                 type: "category",

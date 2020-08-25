@@ -1,25 +1,14 @@
 <template>
-  <div style="width: 28%;">
-    <section>
-      <div class="rightBox">
-        <div class="panel">
-          <h3 class="chart-title">攻击链TOP5</h3>
-          <loadingSign v-if="isLoading" style="top:31%;left:81%"></loadingSign>
-          <div>
-            <div
-
-              id="chartTopn1"
-              class="topnItem"
-              style="width: 100%;height:11rem;"
-            ></div>
-          </div>
-          <h3 class="chart-title">被害设备TOP5</h3>
-          <loadingSign v-if="isLoading" style="top:62%;left:81%"></loadingSign>
-          <div  id="chartTopn2" class="topnItem" style="width: 100%;height:11rem;"></div>
-          <div class="panel-footer"></div>
-        </div>
-      </div>
-    </section>
+  <div class="rightBox">
+    <div class="panel">
+      <h3 class="chart-title">攻击链TOP5</h3>
+      <loadingSign v-if="isLoading" style="top:31%;left:81%"></loadingSign>
+      <div id="chartTopn1" class="topnItem" style="width: 100%;height:37%;"></div>
+      <h3 class="chart-title">被害设备TOP5</h3>
+      <loadingSign v-if="isLoading" style="top:62%;left:81%"></loadingSign>
+      <div id="chartTopn2" class="topnItem" style="width: 100%;height:37%;"></div>
+      <div class="panel-footer"></div>
+    </div>
   </div>
 </template>
 <script>
@@ -32,9 +21,7 @@ export default {
   },
   data() {
     return {
-      isLoading: true,
-      haveData1: true,
-      haveData2: true
+      isLoading: true
     };
   },
   props: {
@@ -42,8 +29,10 @@ export default {
   },
   mounted() {
     this.initEchart();
+    //初始化图表
     const myChart = this.$echarts.init(document.getElementById("chartTopn1"));
     const myChart2 = this.$echarts.init(document.getElementById("chartTopn2"));
+    //监听resize事件
     window.addEventListener("resize", () => {
       myChart.resize();
       myChart2.resize();
@@ -51,58 +40,60 @@ export default {
   },
   methods: {
     async initEchart() {
-      let params = {
-        startTime: this.$parent.$parent.time.startTime,
-        endTime: this.$parent.$parent.time.endTime
-      };
-      if (this.$parent.$parent.time.startTime === undefined) {
+      //开启loading动效
+      this.isLoading = true;
+      //设置时间
+
+      if (this.$parent.$parent.time[0] === "")
+        var params = {
+          startTime: null,
+          endTime: null
+        };
+      else if (this.$parent.$parent.timeData.startTime === undefined)
         params = {
           startTime: null,
           endTime: null
         };
+      else {
+        params = {
+          startTime: this.$parent.$parent.timeData.startTime,
+          endTime: this.$parent.$parent.timeData.endTime
+        };
       }
+      //发起请求
       await this.$http.post("/Attacker/topN", params).then(res => {
         if (res.data.code == 200) {
+          //状态码200,关闭动效
           this.isLoading = false;
           this.data = res.data.data;
-          let flag = false;
-          for (let i = 0; i < res.data.data.topN[0].data.length; i++) {
-            if (res.data.data.topN[0].data[i] != 0) {
-              flag = true;
-            }
-            if(flag == false) this.haveData1 = false;
-          }
-          for (let i = 0; i < res.data.data.topN[1].data.length; i++) {
-            if (res.data.data.topN[1].data[i] != 0) {
-              flag = true;
-            }
-            if(flag == false) this.haveData2 = false;
-          }
-          console.log(this.haveData1, this.haveData2);
+          //初始化图表
           const myChart = this.$echarts.init(
             document.getElementById("chartTopn1")
           );
           const myChart2 = this.$echarts.init(
             document.getElementById("chartTopn2")
           );
+          //放进chartArray方便循环
           const chartArray = [myChart, myChart2];
+          //循环处理图表
           for (let i = 0; i < chartArray.length; i++) {
             const { data } = this.data.topN[i];
             const titlename = this.data.topN[i].titleName;
             const { valdata } = this.data.topN[i];
-
+            //颜色设置
             const myColor = [
-              "#1089E7",
-              "#F57474",
-              "#56D0E3",
-              "#F8B448",
-              "#8B78F6"
+              "#2EE7FF",
+              "#86FED8",
+              "#8ac2f8c4",
+              "#8B78F6",
+              "#0f225E"
             ];
+            //配置图表项,具体参数查询echarts官方文档
             const option = {
               // 图标位置
               grid: {
                 top: "10%",
-                left: "45%",
+                left: "25%",
                 right: "20%",
                 bottom: "10%"
               },

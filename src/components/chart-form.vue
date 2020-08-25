@@ -1,11 +1,14 @@
 <template>
   <section>
+    <!-- 判断传过来的数据是否为空 -->
     <div class="box"  v-if="config!=null">
       <ul class="header">
+        <!-- 循环表头 -->
         <li class="cell" v-for="i in config.header">{{i}}</li>
       </ul>
-      <div class="body" v-if="config!=null">
+      <div class="formbody" v-if="config!=null">
         <ul class="list" >
+          <!-- 循环表单内容 -->
           <li v-for="(item, index) in config.data" :key="index" class="row">
             <span class="cell" v-for="i in item">{{i }}</span>
           </li>
@@ -15,7 +18,7 @@
   </section>
 </template>
 
-<script>
+<script scoped>
 export default {
   data() {
     return {};
@@ -43,9 +46,9 @@ ul {
 .header {
   display: flex;
   height: 1.8rem;
-  background-color: rgb(0, 186, 255);
+  background-color: #196eaafa;
 }
-.body {
+.formbody {
   height: 5 * $cellHeight;
   overflow: hidden;
   height: 95%;
@@ -60,9 +63,9 @@ ul {
 .cell {
   flex: 1;
   height: $cellHeight;
-  line-height: $cellHeight;
   box-sizing: border-box;
   text-align: center;
+  line-height: $cellHeight;
 }
 .list {
   animation: scroll 10s linear infinite;
@@ -83,7 +86,7 @@ ul {
     top: 0;
   }
   to {
-    top: -6 * $cellHeight;
+    top: -5 * $cellHeight;
   }
 }
 </style>

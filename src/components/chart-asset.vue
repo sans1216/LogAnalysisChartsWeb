@@ -3,11 +3,12 @@
     <section style="margin:3% 0 3% 0.6%;height:100%">
       <div class="Echarts" style="height:100%">
         <div class="leftBox">
+          <!-- 边框效果 -->
           <div class="panel">
             <h3 class="chart-title">{{msg}}</h3>
             <loadingSign v-if="isLoading" style="top: 69%;left: 13%;"></loadingSign>
-            <div v-if="haveData" id="assChart1" style="width: 100%;height:100%;"></div>
-            <div v-else class="noDataInfo">未获取到数据</div>
+            <div id="assChart1" style="width: 100%;height:100%;"></div>
+            <!-- <div v-else class="noDataInfo">未获取到数据</div> -->
             <div class="panel-footer"></div>
           </div>
         </div>
@@ -38,6 +39,7 @@ export default {
     data: Array
   },
   mounted() {
+    // 生成图表，并监听resize事件，根据百分比变化图表
     const myChart = this.$echarts.init(document.getElementById("assChart1"));
     this.initEchart();
     window.addEventListener("resize", () => {
@@ -46,18 +48,29 @@ export default {
   },
   methods: {
     async initEchart(data) {
-      let params = {
-        startTime: this.$parent.$parent.time.startTime,
-        endTime: this.$parent.$parent.time.endTime
-      };
-      if (this.$parent.$parent.time.startTime === undefined) {
+      //发请求时，开启loading特效
+      this.isLoading = true;
+      //设置时间
+       if (this.$parent.$parent.time[0] === "")
+        var params = {
+          startTime: null,
+          endTime: null
+        };
+      else if (this.$parent.$parent.timeData.startTime === undefined)
         params = {
           startTime: null,
           endTime: null
         };
+      else {
+        params = {
+          startTime: this.$parent.$parent.timeData.startTime,
+          endTime: this.$parent.$parent.timeData.endTime
+        };
       }
+      //发起请求
       await this.$http.post("/RiskAsset/all", params).then(res => {
         if (res.data.code === 200) {
+          //状态码200，关闭loading
           this.isLoading = false;
           this.assData = res.data.data;
           if (res.data.data.riskAssetVo1.data.length === 0) {
@@ -66,6 +79,7 @@ export default {
           const myChart = this.$echarts.init(
             document.getElementById("assChart1")
           );
+          //chart设置参数，具体配置项可参考echarts官网
           myChart.setOption({
             color: this.colors,
             tooltip: {
@@ -75,7 +89,7 @@ export default {
             legend: {
               orient: "vertical",
               left: 20,
-              top: 100,
+              top:35,
               data: ["低风险", "已失陷", "高风险"],
               textStyle: {
                 color: "white"
@@ -86,8 +100,8 @@ export default {
                 name: "资产分布",
                 type: "pie",
                 radius: ["40%", "50%"],
-                top: -60,
-                left: 0,
+                top: -40,
+                left: 30,
                 bottom: 10,
                 avoidLabelOverlap: false,
                 label: {

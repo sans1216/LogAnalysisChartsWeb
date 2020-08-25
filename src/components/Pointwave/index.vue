@@ -168,3 +168,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+#indexLizi{
+  display: fixed;
+  z-index: 1;
+}
+</style>
